@@ -3,31 +3,27 @@ import { Drawer } from "antd";
 import SidebarIcon from "../assets/sidebar19.svg";
 import SidebarList from "./SidebarList";
 import "../App.css";
-import ProjectsListTrial from "./ProjectsListTrial";
+import SidebarItems from "./SidebarItems";
 
-const Sidebar = () => {
+const Sidebar = (
+  // {selectedProjectId, setSelectedProjectId}
+) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false); //Intially open
-  const [drawerWidth, setDrawerWidth] = useState(250);
+  const [drawerWidth, setDrawerWidth] = useState(270);
   const [isResizing, setIsResizing] = useState(false);
 
-  const toggleDrawer = () => {
-    setIsDrawerOpen(!isDrawerOpen);
-  };
+  const toggleDrawer = () => setIsDrawerOpen(!isDrawerOpen);
 
-  const handleMouseDown = (e) => {
-    setIsResizing(true);
-  };
+  const handleMouseDown = () => setIsResizing(true);
 
   const handleMouseMove = (e) => {
     if (isResizing) {
-      const newWidth = Math.min(Math.max(e.clientX, 250), 400); // Clamp width between 350 and 450
+      const newWidth = Math.min(Math.max(e.clientX, 270), 400);
       setDrawerWidth(newWidth);
     }
   };
 
-  const handleMouseUp = () => {
-    setIsResizing(false);
-  };
+  const handleMouseUp = () => setIsResizing(false);
 
   React.useEffect(() => {
     if (isResizing) {
@@ -77,8 +73,10 @@ const Sidebar = () => {
         }}
       >
         <div className="mt-10">
-          <SidebarList />
-          {/* <ProjectsListTrial /> */}
+          <SidebarItems 
+            // selectedProjectId={selectedProjectId} 
+            // setSelectedProjectId={setSelectedProjectId}
+          />
         </div>
 
         {/* Resizing Handle */}

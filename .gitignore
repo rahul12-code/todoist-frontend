@@ -26,4 +26,6 @@ dist-ssr
 Trail.js 
 SidebarTrial.jsx
 ProjectsListTrial.jsx
-Trail.jsx
+Trial.jsx
+EmptyComponent.jsx
+SidebarList.jsx

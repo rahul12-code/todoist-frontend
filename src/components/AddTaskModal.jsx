@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Button, Modal, Select } from "antd";
-import { TodoistApi } from "@doist/todoist-api-typescript";
+// import { TodoistApi } from "@doist/todoist-api-typescript";
 
-const api = new TodoistApi("7a41b607067ae6d30e04543770815e7f7aeee18e"); // Replace with your actual Todoist API key
+// const api = new TodoistApi("7a41b607067ae6d30e04543770815e7f7aeee18e"); // Replace with your actual Todoist API key
 
-const AddTaskModal = ({ data, inbox, open, onClose, selectedProjectId}) => {
+import { useProjects } from "./ProjectContext";
+
+const AddTaskModal = ({ open, onClose}) => {
+
+  const {api, allProjects, projects, inbox, selectedProjectId } = useProjects();
 
   console.log(selectedProjectId)
 
@@ -22,9 +26,8 @@ const AddTaskModal = ({ data, inbox, open, onClose, selectedProjectId}) => {
     }
   }, [selectedProjectId]);
   
-
   // Combine inbox with other projects
-  const combinedProjects = inbox ? [inbox, ...data] : data;
+  // const combinedProjects = inbox ? [inbox, ...data] : data;
 
   const handleOk = () => {
     setLoading(true);
@@ -35,12 +38,14 @@ const AddTaskModal = ({ data, inbox, open, onClose, selectedProjectId}) => {
         description: taskDescription,
         projectId: projectId,
         priority: 4,
-        dueString: "tomorrow at 12:00",
-        dueLang: "en",
+        dueString: "tomorrow at 5:00",
       })
       .then((task) => {
         setLoading(false);
         onClose();
+        setProjectId(inbox?.id)
+        setTaskContent('');
+        setTaskDescription('');
       })
       .catch((error) => {
         console.error("Error adding task:", error);
@@ -50,6 +55,7 @@ const AddTaskModal = ({ data, inbox, open, onClose, selectedProjectId}) => {
 
   const handleCancel = () => {
     onClose();
+    setProjectId(inbox?.id)
   };
 
   const handleContentChange = (e) => {
@@ -81,7 +87,7 @@ const AddTaskModal = ({ data, inbox, open, onClose, selectedProjectId}) => {
           placeholder="Select a project"
           
         >
-          {combinedProjects.map((project) => (
+          {allProjects.map((project) => (
             <Select.Option key={project.id} value={project.id}>
               {project.name}
             </Select.Option>

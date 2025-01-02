@@ -1,35 +1,44 @@
-import React from "react";
+import React, { useState } from "react";
 import { Menu, Dropdown } from "antd";
-import { EditOutlined, HeartOutlined, DeleteOutlined, EllipsisOutlined, } from "@ant-design/icons";
+import {
+  EditOutlined,
+  HeartOutlined,
+  DeleteOutlined,
+  EllipsisOutlined,
+} from "@ant-design/icons";
 
-const MoreOptions = ({ project, api, content }) => {
+import { useProjects } from "./ProjectContext";
 
+const MoreOptions = ({ project, onEdit, onDelete, updateProject}) => {
+
+  const { api } = useProjects();
+  
+  // Delete Project 
   const handleDeleteProject = async (projectId) => {
     try {
       await api.deleteProject(projectId);
       console.log(`Project with ID ${projectId} deleted successfully.`);
+      onDelete(projectId)
     } catch (error) {
       console.error("Error deleting project:", error);
     }
   };
-  
+
+  // Handle favorite project toggle
   const handleFavoriteProject = async (project) => {
-    try {
-      const updatedProject = await api.updateProject(project.id, {
-        isFavorite: !project.isFavorite,
-      });
-      console.log(
-        `Project with ID ${project.id} updated successfully:`,
-        updatedProject
-      );
-    } catch (error) {
-      console.error("Error updating project:", error);
-    }
+    const updatedProject = {
+      ...project,
+      isFavorite: !project.isFavorite, // Toggle the favorite status
+    };
+
+    // Use the updateProject function passed from Projects component
+    updateProject(updatedProject);
   };
   
+
   const menu = (
     <Menu>
-      <Menu.Item key="edit">
+      <Menu.Item key="edit" onClick={() => onEdit(project)}>
         <div className="flex gap-3 items-center">
           <EditOutlined />
           <span>Edit</span>
@@ -55,7 +64,7 @@ const MoreOptions = ({ project, api, content }) => {
   return (
     <Dropdown overlay={menu} trigger={["click"]} placement="topLeft">
       <span
-        className="text-gray-500 cursor-pointer hover:text-gray-700 text-[18px] ml-20"
+        className="text-gray-500 cursor-pointer hover:text-gray-700 text-[18px]"
         onClick={(e) => e.stopPropagation()} // Prevent parent click
       >
         <EllipsisOutlined />

@@ -3,24 +3,27 @@ import { useState } from "react";
 import Favorites from "./Favorites";
 import Projects from "./Projects";
 import AddTaskModal from "./AddTaskModal";
+import { Link } from "react-router-dom";
+import { useProjects } from "./ProjectContext";
 
 const SidebarItems = ({
-  favorites,
-  data,
-  inbox,
-  onProjectClick,
-  selectedProjectId,
-  onProjectAdded,
+  // favorites,
+  // data,
+  // inbox,
+  // onProjectClick,
+  // selectedProjectId,
+  // onProjectAdded,
 }) => {
 
-  const [modalVisible, setModalVisible] = useState(false);
+  const {inbox, selectedProjectId, setSelectedProjectId, tasksmodalVisible, setTasksModalVisible} = useProjects();
+  // const [modalVisible, setModalVisible] = useState(false);
 
   return (
     <div className="text-[16px]">
       <div className="mb-4 flex items-center gap-2 cursor-pointer">
         <div
           // onClick={handleAddTaskClick}
-          onClick={() => setModalVisible(true)}
+          onClick={() => setTasksModalVisible(true)}
           className="flex justify-center items-center w-[22px] h-[22px] rounded-full bg-[#ab2307] text-white text-[20px]"
         >
           +
@@ -30,13 +33,13 @@ const SidebarItems = ({
 
       {/* Add Task Modal */}
       <AddTaskModal
-        data={data}
-        inbox={inbox}
-        open={modalVisible}
+        // data={data}
+        // inbox={inbox}
+        open={tasksmodalVisible}
         onClose={() => {
-          setModalVisible(false);
+          setTasksModalVisible(false);
         }}
-        selectedProjectId={selectedProjectId}
+        // selectedProjectId={selectedProjectId}
       />
 
       {/* Inbox */}
@@ -44,7 +47,7 @@ const SidebarItems = ({
         <div className="mb-4">
           <ul>
             <li
-              onClick={() => onProjectClick(inbox.id)}
+              onClick={() => setSelectedProjectId(inbox.id)}
               className={`font-medium text-[17px] p-2 pl-0 rounded cursor-pointer ${
                 selectedProjectId === inbox.id
                   ? "bg-orange-200 text-orange-700"
@@ -59,18 +62,17 @@ const SidebarItems = ({
 
       {/* Favorites Section */}
       <Favorites
-        favorites={favorites}
-        onProjectClick={onProjectClick}
-        selectedProjectId={selectedProjectId}
+        // favorites={favorites}
+        // onProjectClick={onProjectClick}
+        // selectedProjectId={selectedProjectId}
       />
 
       {/* Projects Section */}
       <Projects
-      favorites={favorites}
-        content={data}
-        onProjectClick={onProjectClick}
-        selectedProjectId={selectedProjectId}
-        onProjectAdded={onProjectAdded}
+        // content={data}
+        // onProjectClick={onProjectClick}
+        // selectedProjectId={selectedProjectId}
+        // onProjectAdded={onProjectAdded}
       />
     </div>
   );

@@ -1,63 +1,92 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Input, Button, Switch, Select } from "antd";
-import { TodoistApi } from "@doist/todoist-api-typescript";
+// import { TodoistApi } from "@doist/todoist-api-typescript";
 import ColorSelect from "./ColorSelect";
 
-
 // Todoist API instance
-const api = new TodoistApi("7a41b607067ae6d30e04543770815e7f7aeee18e");
+// const api = new TodoistApi("7a41b607067ae6d30e04543770815e7f7aeee18e");
+
+import { useProjects } from "./ProjectContext";
+
 
 const AddProjectModal = ({
   open,
   onClose,
   onProjectAdded,
+  onProjectUpdated,
+  editingProject,
   selectedColor,
   setSelectedColor,
 }) => {
+  const { api } = useProjects();
   const [projectName, setProjectName] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
 
   // Reset the modal internal state when it becomes visible
   useEffect(() => {
     if (open) {
-      setProjectName("");
-      setIsFavorite(false);
+      if (editingProject) {
+        setProjectName(editingProject.name);
+        setIsFavorite(editingProject.isFavorite);
+        setSelectedColor(editingProject.color);
+      } else {
+        setProjectName("");
+        setIsFavorite(false);
+        setSelectedColor("charcoal");
+      }
     }
-  }, [open]);
+  }, [open, editingProject]);
 
-  const handleAddProject = () => {
-    api
-      .addProject({
-        name: projectName,
-        isFavorite: isFavorite,
-        color: selectedColor,
-      })
-      .then((project) => {
-        console.log("Project added:", project);
-        // Adding color to the project data
-        const newProject = { ...project, color: selectedColor };
+  const handleAddOrUpdateProject = () => {
+    const projectData = {
+      name: projectName,
+      isFavorite: isFavorite,
+      color: selectedColor,
+    };
 
-        onProjectAdded(newProject); // Passing the added project back to parent
-        onClose(); // Close the modal after adding
-      })
-      .catch((error) => {
-        console.error("Error adding project:", error);
-      });
+    if (editingProject) {
+      // Update project
+      api
+        .updateProject(editingProject.id, projectData)
+        .then((updatedProject) => {
+          console.log("Project updated:", updatedProject);
+          // onProjectUpdated({ ...editingProject, ...projectData });
+          onProjectUpdated(updatedProject);
+          onClose();
+        })
+        .catch((error) => console.error("Error updating project:", error));
+    } else {
+      // Add project
+      api
+        .addProject(projectData)
+        .then((newProject) => {
+          console.log("Project added:", newProject);
+          // onProjectAdded(newProject);
+          onProjectAdded(newProject);
+          onClose();
+        })
+        .catch((error) => console.error("Error adding project:", error));
+    }
   };
 
   return (
     <Modal
-      title="Add Project"
+      title={editingProject ? "Edit Project" : "Add Project"}
       mask={false}
-      open={open} 
+      open={open}
       onCancel={onClose}
       footer={[
         <Button className="font-semibold" key="back" onClick={onClose}>
           Cancel
         </Button>,
-        <Button className="bg-orange-400 hover:bg-orange-600 font-semibold" key="submit" type="primary" onClick={handleAddProject}>
-          Add Project
-        </Button>,
+        <Button
+        className="bg-orange-400 hover:bg-orange-600 font-semibold"
+        key="submit"
+        type="primary"
+        onClick={handleAddOrUpdateProject}
+      >
+        {editingProject ? "Update Project" : "Add Project"}
+      </Button>,
       ]}
     >
       <hr></hr>

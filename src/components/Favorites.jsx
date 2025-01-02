@@ -2,7 +2,13 @@ import React, { useState } from "react";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import { colorOptions } from "../ColorOptions";
 
-const Favorites = ({ favorites, onProjectClick, selectedProjectId }) => {
+import { useProjects } from "./ProjectContext";
+
+const Favorites = (
+  // { favorites, onProjectClick, selectedProjectId }
+) => {
+
+  const {favorites, selectedProjectId, setSelectedProjectId} = useProjects();
   const [favoritesVisible, setFavoritesVisible] = useState(true);
 
   const getHashtagColor = (project) => {
@@ -28,7 +34,7 @@ const Favorites = ({ favorites, onProjectClick, selectedProjectId }) => {
               {favorites.map((project) => (
                 <li
                   key={project.id}
-                  onClick={() => onProjectClick(project.id)}
+                  onClick={() => setSelectedProjectId(project.id)}
                   className={`p-2 rounded cursor-pointer flex items-center gap-2 ${
                     selectedProjectId === project.id
                       ? "bg-orange-200 text-orange-700"

@@ -1,117 +1,117 @@
-import React from "react";
-import { Menu } from "antd";
-import { EditOutlined, HeartOutlined, DeleteOutlined } from "@ant-design/icons";
-import { removeProjectTodo, updateIsFavourite } from "./apiOperations";
-const MoreOptionsModel = ({ element }) => {
-  console.log("This is the more data", element.isFavorite);
-  return (
-    <div className="relative left-10">
-      <Menu>
-        <Menu.Item key="1">
-          <div className="flex gap-5">
-            <EditOutlined />
-            <p>Edit</p>
-          </div>
-        </Menu.Item>
+import React, { useState, useEffect } from "react";
+import { FaChevronDown, FaChevronRight } from "react-icons/fa";
+import { useProjects } from "../context/ProjectContext"; // Import the useProjects hook
+import AddProjectModal from "./AddProjectModal";
+import { colorOptions } from "../ColorOptions";
+import MoreOptions from "./MoreOptions";
 
-        <Menu.Item key="2">
-          <div
-            className="flex gap-5 "
-            onClick={() => updateIsFavourite(element.id, element.isFavorite)}
-          >
-            <HeartOutlined style={{ fill: "black" }} />
-            <p>
-              {element.isFavorite
-                ? "Remove from Favourites"
-                : "Add to Favourite"}
-            </p>
-          </div>
-        </Menu.Item>
+const Projects = ({ content, onProjectClick, selectedProjectId }) => {
+  const { projects, addProject, updateProject, deleteProject } = useProjects(); // Use context
+  const [projectsVisible, setProjectsVisible] = useState(true);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedColor, setSelectedColor] = useState("charcoal");
+  const [hoveredProjectId, setHoveredProjectId] = useState(null);
+  const [editingProject, setEditingProject] = useState(null);
 
-        <Menu.Item key="3">
-          <div
-            className="flex gap-5 text-red"
-            onClick={() => removeProjectTodo(element.id)}
-          >
-            <DeleteOutlined />
-            <p>Delete</p>
-          </div>
-        </Menu.Item>
-      </Menu>
-    </div>
-  );
-};
-
-import React, { useState } from "react";
-import hash from "../assets/hash.svg";
-import { EllipsisOutlined } from "@ant-design/icons";
-import { Dropdown } from "antd";
-import { useActionState } from "react";
-import MoreOptionsModel from "./MoreOptionsModel";
-const IndividualProject = ({ list, selectedProject, setSelectedProject }) => {
-  const [moreOptions, setMoreOptions] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false);
-
-  const showModal = () => {
-    setIsModalVisible(true);
+  const getHashtagColor = (project) => {
+    const color = colorOptions.find((option) => option.value === project.color);
+    return color ? color.color : "#36454F";
   };
 
-  const handleClose = () => {
-    setIsModalVisible(false);
+  const handleEditProject = (project) => {
+    setEditingProject(project); 
+    setSelectedColor(project.color); 
+    setModalVisible(true); 
   };
-  function handleMoreOptions(e) {
-    setMoreOptions(true);
-    console.log(selectedProject, moreOptions);
-  }
-  function handleSelectedProject(id) {
-    setSelectedProject(id);
-    // setMoreOptions(false);
-    console.log("the id is : ", id);
-  }
-  console.log(selectedProject, moreOptions, "this is the data");
+
+  const handleProjectUpdated = (updatedProject) => {
+    updateProject(updatedProject); // Use context to update the project
+  };
+
+  const handleProjectAdded = (newProject) => {
+    addProject(newProject); // Use context to add the project
+  };
+
+  const handleProjectDeleted = (projectId) => {
+    deleteProject(projectId); // Use context to delete the project
+  };
+
+  useEffect(() => {
+    setProjects(content); // Ensure projects are updated with new context values
+  }, [content]);
 
   return (
     <div>
-      <ul>
-        {list.map((element) => (
-          // <li key={element.id} className="hover:bg-hover_sidenav cursor-pointer">
-          // <span className={`text-${element.color} text-lg`}># </span>
-          // <span>{element.name}</span>
-          // </li>
-          <div
-            key={element.id}
-            onClick={() => handleSelectedProject(element.id)}
-            className={`group cursor-pointer flex justify-between items-baseline
-px-2 py-1 rounded-lg ${
-              selectedProject === element.id
-                ? "bg-select_sidenav"
-                : "hover:bg-hover_sidenav"
-            }`}
+      <div className="flex items-center justify-between cursor-pointer hover:bg-gray-200 rounded-sm">
+        <Link
+          to="/my-projects"
+          className="text-gray-700 font-semibold hover:text-gray-700"
+        >
+          My Projects
+        </Link>
+        <div className="flex gap-2 text-gray-600 items-center">
+          <span
+            className="text-gray-500 text-[22px] px-2 hover:text-gray-600"
+            onClick={() => setModalVisible(true)}
           >
-            <div className="flex gap-x-2 items-center">
-              <p className={`text-${element.color} text-lg`}># </p>
-              <p
-                className={`${
-                  selectedProject === element.id ? "text-red" : ""
-                }`}
+            +
+          </span>
+          <span
+            className="text-gray-500 text-[15px] p-1 hover:text-gray-600"
+            onClick={() => setProjectsVisible(!projectsVisible)}
+          >
+            {projectsVisible ? <FaChevronDown /> : <FaChevronRight />}
+          </span>
+        </div>
+      </div>
+
+      {projectsVisible && (
+        <ul>
+          {projects.map((project) => (
+            <li
+              key={project.id}
+              onMouseEnter={() => setHoveredProjectId(project.id)}
+              onMouseLeave={() => setHoveredProjectId(null)}
+              onClick={() => onProjectClick(project.id)}
+              className={`group p-2 rounded cursor-pointer flex items-center gap-2 ${
+                selectedProjectId === project.id
+                  ? "bg-orange-200 text-orange-700"
+                  : "hover:bg-gray-200"
+              }`}
+            >
+              <span
+                className="text-[18px] font-semibold"
+                style={{ color: getHashtagColor(project) }}
               >
-                {element.name}
-              </p>
-            </div>
-            <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-              <Dropdown
-                trigger={["click"]}
-                overlay={<MoreOptionsModel element={element} />}
-                placement="rightTop"
-              >
-                <EllipsisOutlined />
-              </Dropdown>
-            </div>
-          </div>
-        ))}
-      </ul>
-      {/* {isModalVisible?(<MoreOptionsModel isModalVisible={isModalVisible}
-handleClose={handleClose}/>):(<></>)} */}
+                #
+              </span>
+              {project.name}
+
+              {hoveredProjectId === project.id && (
+                <div className="group-hover:opacity-100">
+                  <MoreOptions
+                    project={project}
+                    onEdit={handleEditProject}
+                    onDelete={handleProjectDeleted} // Pass delete handler
+                  />
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <AddProjectModal
+        open={modalVisible}
+        onClose={() => setModalVisible(false)}
+        onProjectAdded={handleProjectAdded}
+        onProjectUpdated={handleProjectUpdated}
+        editingProject={editingProject}
+        selectedColor={selectedColor}
+        setSelectedColor={setSelectedColor}
+      />
     </div>
   );
 };
+
+export default Projects;

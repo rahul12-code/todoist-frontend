@@ -1,22 +1,41 @@
 import React from "react";
 import { SearchOutlined } from "@ant-design/icons";
-import MoreOptions from "./MoreOptions";
+
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { colorOptions } from "../ColorOptions";
 import AddProjectModal from "./AddProjectModal";
+import MoreOptions from "./MoreOptions";
 
-const MyProjectsPage = ({ projects, api }) => {
-  const location = useLocation();
-  console.log(useLocation())
-//   const { onProjectAdded } = location.state || {};
+import { useProjects } from "./ProjectContext";
+
+const MyProjectsPage = ({
+  // projects,
+  // api,
+  // selectedProjectId,
+  // setSelectedProjectId,
+}) => {
+
+  const { 
+    selectedProjectId, setSelectedProjectId,
+    projects, addProject, updateProject, deleteProject, 
+    projectsmodalVisible, setProjectsModalVisible,
+    selectedColor, setSelectedColor,
+    // hoveredProjectId, setHoveredProjectId,
+    editingProject, setEditingProject 
+  } = useProjects();
+
+  // const location = useLocation();
+  // console.log(useLocation());
 
   // State to track the search query
   const [searchQuery, setSearchQuery] = useState("");
   const [hoveredProjectId, setHoveredProjectId] = useState(null); // State to track the hovered project
 
-  const [modalVisible, setModalVisible] = useState(false); // State for modal visibility
-  const [selectedColor, setSelectedColor] = useState("charcoal");
+  // const [projectsmodalVisible, setProjectsModalVisible] = useState(false); // State for modal visibility
+  // const [selectedColor, setSelectedColor] = useState("charcoal");
+
+  // const [editingProject, setEditingProject] = useState(null);
 
   const getHashtagColor = (project) => {
     const color = colorOptions.find((option) => option.value === project.color);
@@ -27,6 +46,28 @@ const MyProjectsPage = ({ projects, api }) => {
   const filteredProjects = projects.filter((project) =>
     project.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const resetModalState = () => {
+    setSelectedColor("charcoal");
+    setEditingProject(null);
+  };
+
+  const handleEditProject = (project) => {
+    setEditingProject(project); // The project to be edited
+    setProjectsModalVisible(true); // Open the modal
+  };
+
+  const handleProjectUpdated = (updatedProject) => {
+    updateProject(updatedProject); // Use context to update the project
+  };
+
+  const handleProjectAdded = (newProject) => {
+    addProject(newProject); // Use context to add the project
+  };
+
+  const handleProjectDeleted = (projectId) => {
+    deleteProject(projectId); // Use context to delete the project
+  };
 
   return (
     <>
@@ -46,12 +87,27 @@ const MyProjectsPage = ({ projects, api }) => {
           {/* Add button */}
           <div className="flex justify-end mb-2 ">
             <button
-              className="text-[25px] font-normal px-2 rounded-lg hover:bg-gray-200"
-              onClick={() => setModalVisible(true)}
+              className="text-[25px] font-normal px-2 rounded-[50%] hover:bg-gray-200"
+              onClick={() => setProjectsModalVisible(true)}
             >
               +
             </button>
           </div>
+
+          {/* AddProjectModal Component */}
+          <AddProjectModal
+            open={projectsmodalVisible}
+            onClose={() => {
+              setProjectsModalVisible(false);
+              resetModalState();
+            }}
+            // onProjectAdded={onProjectAdded}
+            onProjectAdded={handleProjectAdded}
+            onProjectUpdated={handleProjectUpdated}
+            editingProject={editingProject}
+            selectedColor={selectedColor}
+            setSelectedColor={setSelectedColor}
+          />
 
           <p className="text-gray-700 font-medium mb-2 ">
             {filteredProjects.length} projects
@@ -63,11 +119,15 @@ const MyProjectsPage = ({ projects, api }) => {
                 key={project.id}
                 onMouseEnter={() => setHoveredProjectId(project.id)}
                 onMouseLeave={() => setHoveredProjectId(null)}
-                className="p-2 rounded cursor-pointer hover:bg-gray-100 flex items-center justify-between"
+                onClick={(e) => {
+                  setSelectedProjectId(project.id);
+                  (e) => e.stopPropagation()
+                }}
+                className="group p-2 rounded cursor-pointer flex items-center justify-between gap-2 hover:bg-gray-200"
               >
                 <div className="flex items-center">
                   <span
-                    className="text-[18px] font-semibold"
+                    className="text-[18px] font-semibold mr-3"
                     style={{ color: getHashtagColor(project) }}
                   >
                     #
@@ -79,9 +139,12 @@ const MyProjectsPage = ({ projects, api }) => {
                 {hoveredProjectId === project.id && (
                   <MoreOptions
                     project={project}
-                    api={api}
+                    // api={api}
                     // setProjects={setProjects}
-                    content={projects}
+                    // content={projects}
+                    onEdit={handleEditProject}
+                    onDelete={handleProjectDeleted} // Pass delete handler
+                    updateProject={handleProjectUpdated}
                   />
                 )}
               </li>
@@ -89,15 +152,6 @@ const MyProjectsPage = ({ projects, api }) => {
           </ul>
         </div>
       </div>
-
-      {/* AddProjectModal Component */}
-      <AddProjectModal
-        open={modalVisible}
-        onClose={() => setModalVisible(false)}
-        // onProjectAdded={onProjectAdded}
-        selectedColor={selectedColor}
-        setSelectedColor={setSelectedColor}
-      />
     </>
   );
 };
