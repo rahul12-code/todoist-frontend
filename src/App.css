@@ -1,0 +1,5 @@
+/* index.css or any other global stylesheet */
+.ant-drawer-content-wrapper,
+.ant-drawer-content {
+  box-shadow: none !important; /* Ensure no shadow */
+}
