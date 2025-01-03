@@ -20,7 +20,7 @@ const Favorites = (
     <div className="mb-4">
       {favorites.length > 0 && (
         <>
-          <div className="flex items-center justify-between cursor-pointer">
+          <div className="flex items-center justify-between cursor-pointer mb-2">
             <h2 className="text-gray-700 font-semibold">Favorites</h2>
             <span
               className="text-gray-600 text-[15px] p-1 hover:bg-gray-200 rounded-sm"

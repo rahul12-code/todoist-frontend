@@ -7,22 +7,14 @@ import { Link } from "react-router-dom";
 import { useProjects } from "./ProjectContext";
 
 const SidebarItems = ({
-  // favorites,
-  // data,
-  // inbox,
-  // onProjectClick,
-  // selectedProjectId,
-  // onProjectAdded,
 }) => {
 
   const {inbox, selectedProjectId, setSelectedProjectId, tasksmodalVisible, setTasksModalVisible} = useProjects();
-  // const [modalVisible, setModalVisible] = useState(false);
 
   return (
     <div className="text-[16px]">
       <div className="mb-4 flex items-center gap-2 cursor-pointer">
         <div
-          // onClick={handleAddTaskClick}
           onClick={() => setTasksModalVisible(true)}
           className="flex justify-center items-center w-[22px] h-[22px] rounded-full bg-[#ab2307] text-white text-[20px]"
         >
@@ -33,13 +25,10 @@ const SidebarItems = ({
 
       {/* Add Task Modal */}
       <AddTaskModal
-        // data={data}
-        // inbox={inbox}
         open={tasksmodalVisible}
         onClose={() => {
           setTasksModalVisible(false);
         }}
-        // selectedProjectId={selectedProjectId}
       />
 
       {/* Inbox */}
@@ -61,19 +50,10 @@ const SidebarItems = ({
       )}
 
       {/* Favorites Section */}
-      <Favorites
-        // favorites={favorites}
-        // onProjectClick={onProjectClick}
-        // selectedProjectId={selectedProjectId}
-      />
+      <Favorites/>
 
       {/* Projects Section */}
-      <Projects
-        // content={data}
-        // onProjectClick={onProjectClick}
-        // selectedProjectId={selectedProjectId}
-        // onProjectAdded={onProjectAdded}
-      />
+      <Projects/>
     </div>
   );
 };

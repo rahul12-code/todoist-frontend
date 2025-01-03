@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Button, Modal, Select } from "antd";
-// import { TodoistApi } from "@doist/todoist-api-typescript";
-
-// const api = new TodoistApi("7a41b607067ae6d30e04543770815e7f7aeee18e"); // Replace with your actual Todoist API key
 
 import { useProjects } from "./ProjectContext";
 
@@ -17,7 +14,7 @@ const AddTaskModal = ({ open, onClose}) => {
   const [taskDescription, setTaskDescription] = useState("");
   
   const [projectId, setProjectId] = useState(
-    selectedProjectId || inbox?.id || (data[0] && data[0].id) // Default to selectedProjectId, inbox, or first project
+    selectedProjectId || inbox?.id || (projects[0] && projects[0].id) // Default to selectedProjectId, inbox, or first project
   );
 
   useEffect(() => {

@@ -80,7 +80,7 @@ const Projects = ({
 
   return (
     <div>
-      <div className="flex items-center justify-between cursor-pointer hover:bg-gray-200 rounded-sm">
+      <div className="flex items-center justify-between cursor-pointer hover:bg-gray-200 rounded-sm mb-2">
         {/* Use Link for navigation */}
         <Link
           to="/my-projects"
@@ -147,7 +147,7 @@ const Projects = ({
                 </span>
                 <Link
                   to={`/my-projects/${project.name}`}
-                  className=" font-medium "
+                  className="font-medium"
                 >
                   {project.name}
                 </Link>
