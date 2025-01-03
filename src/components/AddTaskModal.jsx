@@ -5,9 +5,7 @@ import { useProjects } from "./ProjectContext";
 
 const AddTaskModal = ({ open, onClose}) => {
 
-  const {api, allProjects, projects, inbox, selectedProjectId } = useProjects();
-
-  console.log(selectedProjectId)
+  const {api, allProjects, projects, inbox, selectedProjectId, setTasks } = useProjects();
 
   const [loading, setLoading] = useState(false);
   const [taskContent, setTaskContent] = useState("");
@@ -17,27 +15,20 @@ const AddTaskModal = ({ open, onClose}) => {
     selectedProjectId || inbox?.id || (projects[0] && projects[0].id) // Default to selectedProjectId, inbox, or first project
   );
 
-  useEffect(() => {
-    if (selectedProjectId) {
-      setProjectId(selectedProjectId);
-    }
-  }, [selectedProjectId]);
-
   const handleOk = () => {
     setLoading(true);
-
     api
       .addTask({
         content: taskContent,
         description: taskDescription,
         projectId: projectId,
-        priority: 4,
-        dueString: "tomorrow at 5:00",
       })
       .then((task) => {
         setLoading(false);
+        if (selectedProjectId === task.projectId) {
+          setTasks((prevTasks) => [...prevTasks, task]);
+        }
         onClose();
-        setProjectId(inbox?.id)
         setTaskContent('');
         setTaskDescription('');
       })
@@ -49,7 +40,6 @@ const AddTaskModal = ({ open, onClose}) => {
 
   const handleCancel = () => {
     onClose();
-    setProjectId(inbox?.id)
   };
 
   const handleContentChange = (e) => {
@@ -101,7 +91,8 @@ const AddTaskModal = ({ open, onClose}) => {
         </Button>,
       ]}
     >
-      <div className="mb-4">
+      <hr />
+      <div className="mb-4 mt-3">
         <input
           type="text"
           value={taskContent}

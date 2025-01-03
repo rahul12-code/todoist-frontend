@@ -4,13 +4,14 @@ import AddTask from "./AddTask";
 import { EditOutlined } from "@ant-design/icons";
 
 import { useProjects } from "./ProjectContext";
+import TickMark from "../assets/tick-mark.svg";
 import "../App.css";
 
 const SingleProjectPage = () => {
-  const { api, allProjects, updateProject, selectedProjectId } = useProjects();
+  const { api, allProjects, updateProject, selectedProjectId, tasks, setTasks } = useProjects();
 
   const { projectName } = useParams();
-  const [tasks, setTasks] = useState([]);
+  // const [tasks, setTasks] = useState([]);
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedProjectName, setEditedProjectName] = useState(projectName);
@@ -117,36 +118,47 @@ const SingleProjectPage = () => {
         <ul className="list-none p-0">
           {tasks.map((task) => (
             <li
-            key={task.id}
-            className="flex items-center p-4 text-[16px] border-b border-gray-300 cursor-pointer rounded-md group"
-          >
-            {taskBeingEdited?.id === task.id ? (
-              <AddTask
-                onUpdateTask={handleUpdateTask}
-                onCancel={() => setTaskBeingEdited(null)}
-                initialData={task}
-                taskBeingEdited={taskBeingEdited}
-              />
-            ) : (
-              <>
-                <input
-                  type="checkbox"
-                  className="relative mr-3 w-[18px] h-[18px] rounded-full cursor-pointer appearance-none border border-gray-400"
-                  onClick={() => handleDeleteTask(task.id)}
+              key={task.id}
+              className="flex items-center p-4 text-[16px] border-b border-gray-300 cursor-pointer rounded-md group"
+            >
+              {taskBeingEdited?.id === task.id ? (
+                <AddTask
+                  onUpdateTask={handleUpdateTask}
+                  onCancel={() => setTaskBeingEdited(null)}
+                  initialData={task}
+                  taskBeingEdited={taskBeingEdited}
                 />
-                <div className="flex flex-col flex-grow">
-                  <p className="text-[16px]">{task.content}</p>
-                  <p className="text-[13px] text-gray-600">
-                    {task.description}
-                  </p>
-                </div>
-                <EditOutlined
-                  className="text-gray-600 text-[20px] hover:text-blue-500 hidden group-hover:block"
-                  onClick={() => setTaskBeingEdited(task)}
-                />
-              </>
-            )}
-          </li>
+              ) : (
+                <>
+                
+                  <div className="relative">
+                    <input
+                      type="checkbox"
+                      className="absolute opacity-0 w-[18px] h-[18px] cursor-pointer"
+                      onClick={() => handleDeleteTask(task.id)}
+                    />
+                    <div className="w-[18px] h-[18px] rounded-full border border-gray-400 flex justify-center items-center cursor-pointer">
+                      <img
+                        src={TickMark} 
+                        alt="Tick Mark"
+                        className="hidden group-hover:block w-[17px] h-[17px]"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col flex-grow ml-3">
+                    <p className="text-[16px]">{task.content}</p>
+                    <p className="text-[13px] text-gray-600">
+                      {task.description}
+                    </p>
+                  </div>
+                  <EditOutlined
+                    className="text-gray-600 text-[20px] hover:text-blue-500 hidden group-hover:block"
+                    onClick={() => setTaskBeingEdited(task)}
+                  />
+                </>
+              )}
+            </li>
           ))}
         </ul>
 
@@ -155,6 +167,7 @@ const SingleProjectPage = () => {
           <AddTask
             onAddTask={handleAddTask}
             onCancel={() => setIsAddTaskVisible(false)} // Handle cancel action
+            taskBeingEdited={taskBeingEdited}
           />
         ) : (
           <div

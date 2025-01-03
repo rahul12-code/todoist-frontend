@@ -9,14 +9,22 @@ import { Link } from "react-router-dom";
 import { useProjects } from "./ProjectContext";
 
 const Projects = () => {
-
-  const { 
-    projects, addProject, updateProject, deleteProject, 
-    selectedProjectId, setSelectedProjectId,
-    projectsmodalVisible, setProjectsModalVisible,
-    selectedColor, setSelectedColor,
-    hoveredProjectId, setHoveredProjectId,
-    editingProject, setEditingProject } = useProjects();
+  const {
+    projects,
+    addProject,
+    updateProject,
+    deleteProject,
+    selectedProjectId,
+    setSelectedProjectId,
+    projectsmodalVisible,
+    setProjectsModalVisible,
+    selectedColor,
+    setSelectedColor,
+    hoveredProjectId,
+    setHoveredProjectId,
+    editingProject,
+    setEditingProject,
+  } = useProjects();
 
   const [projectsVisible, setProjectsVisible] = useState(true);
 
@@ -31,7 +39,7 @@ const Projects = () => {
   };
 
   const handleEditProject = (project) => {
-    setEditingProject(project); 
+    setEditingProject(project);
     setProjectsModalVisible(true); // Open the modal
   };
 
@@ -52,7 +60,7 @@ const Projects = () => {
       <div className="flex items-center justify-between cursor-pointer hover:bg-gray-200 rounded-sm mb-2">
         {/* Use Link for navigation */}
         <Link
-          to="/my-projects"
+          to="/"
           className="text-gray-700 font-semibold hover:text-gray-700"
         >
           My Projects
@@ -95,25 +103,27 @@ const Projects = () => {
               key={project.id}
               onMouseEnter={() => setHoveredProjectId(project.id)}
               onMouseLeave={() => setHoveredProjectId(null)}
-              onClick={() => setSelectedProjectId(project.id)}
+              // onClick={() => setSelectedProjectId(project.id)}
               className={`group p-2 rounded cursor-pointer flex items-center justify-between ${
                 selectedProjectId === project.id
                   ? "bg-orange-200 text-orange-700"
                   : "hover:bg-gray-200"
               }`}
             >
-              <div>
-                <span
-                  className="text-[18px] font-semibold mr-2"
-                  style={{ color: getHashtagColor(project) }}
+              <div 
+                className="w-full"
+                onClick={() => setSelectedProjectId(project.id)}
                 >
-                  #
-                </span>
-                <Link
-                  to={`/my-projects/${project.name}`}
-                  className="font-medium"
-                >
-                  {project.name}
+                <Link to={`/my-projects/${project.name}`}>
+                  <div className="flex items-center">
+                    <span
+                      className="text-[18px] font-semibold mr-2"
+                      style={{ color: getHashtagColor(project) }}
+                    >
+                      #
+                    </span>
+                    <span>{project.name}</span>
+                  </div>
                 </Link>
               </div>
 
@@ -134,8 +144,6 @@ const Projects = () => {
           ))}
         </ul>
       )}
-
-      
     </div>
   );
 };

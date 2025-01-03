@@ -3,10 +3,10 @@ import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import { colorOptions } from "../ColorOptions";
 
 import { useProjects } from "./ProjectContext";
+import { Link } from "react-router-dom";
 
 const Favorites = () => {
-
-  const {favorites, selectedProjectId, setSelectedProjectId} = useProjects();
+  const { favorites, selectedProjectId, setSelectedProjectId } = useProjects();
   const [favoritesVisible, setFavoritesVisible] = useState(true);
 
   const getHashtagColor = (project) => {
@@ -30,23 +30,25 @@ const Favorites = () => {
           {favoritesVisible && (
             <ul>
               {favorites.map((project) => (
-                <li
-                  key={project.id}
-                  onClick={() => setSelectedProjectId(project.id)}
-                  className={`p-2 rounded cursor-pointer flex items-center gap-2 ${
-                    selectedProjectId === project.id
-                      ? "bg-orange-200 text-orange-700"
-                      : "hover:bg-gray-200"
-                  }`}
-                >
-                  <span
-                    className="text-[18px] font-semibold"
-                    style={{ color: getHashtagColor(project) }}
+                <Link to={`/my-projects/${project.name}`} key={project.id}>
+                  <li
+                    key={project.id}
+                    onClick={() => setSelectedProjectId(project.id)}
+                    className={`p-2 rounded cursor-pointer flex items-center gap-2 ${
+                      selectedProjectId === project.id
+                        ? "bg-orange-200 text-orange-700"
+                        : "hover:bg-gray-200"
+                    }`}
                   >
-                    #
-                  </span>
-                  {project.name}
-                </li>
+                    <span
+                      className="text-[18px] font-semibold"
+                      style={{ color: getHashtagColor(project) }}
+                    >
+                      #
+                    </span>
+                    {project.name}
+                  </li>
+                </Link>
               ))}
             </ul>
           )}

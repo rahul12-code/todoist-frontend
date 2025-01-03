@@ -16,6 +16,8 @@ export const ProjectProvider = ({ children }) => {
   const [hoveredProjectId, setHoveredProjectId] = useState(null);
   const [editingProject, setEditingProject] = useState(null);
 
+  const [tasks, setTasks] = useState([]);
+
   useEffect(() => {
     api
       .getProjects()
@@ -76,6 +78,9 @@ export const ProjectProvider = ({ children }) => {
 
         editingProject,
         setEditingProject,
+
+        tasks,
+        setTasks,
       }}
     >
       {children}

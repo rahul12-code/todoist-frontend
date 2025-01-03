@@ -3,7 +3,7 @@ import { useProjects } from "./ProjectContext";
 import { Select } from "antd";
 
 const AddTask = ({ onAddTask, onUpdateTask, onCancel, initialData, taskBeingEdited }) => {
-  const { api, allProjects, projects, inbox, selectedProjectId } =
+  const { allProjects, projects, inbox, selectedProjectId } =
     useProjects();
 
     console.log(selectedProjectId);
@@ -81,13 +81,13 @@ const AddTask = ({ onAddTask, onUpdateTask, onCancel, initialData, taskBeingEdit
         <div className="flex space-x-2">
           <button
             onClick={onCancel}
-            className="bg-orange-500 text-white px-2 py-1 rounded-md hover:bg-blue-600"
+            className="bg-gray-400 text-white px-2 py-1 rounded-md hover:bg-gray-600"
           >
             Cancel
           </button>
           <button
             onClick={handleAddorUpdateTask}
-            className="bg-orange-500 text-white px-2 py-1 rounded-md hover:bg-blue-600"
+            className="bg-[#ab2307] text-white px-2 py-1 rounded-md hover:bg-blue-600"
           >
             {taskBeingEdited===null?'Add Task':'Save'}
           </button>

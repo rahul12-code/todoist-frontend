@@ -9,16 +9,15 @@ import {
 
 import { useProjects } from "./ProjectContext";
 
-const MoreOptions = ({ project, onEdit, onDelete, updateProject}) => {
-
+const MoreOptions = ({ project, onEdit, onDelete, updateProject }) => {
   const { api } = useProjects();
-  
-  // Delete Project 
+
+  // Delete Project
   const handleDeleteProject = async (projectId) => {
     try {
       await api.deleteProject(projectId);
       console.log(`Project with ID ${projectId} deleted successfully.`);
-      onDelete(projectId)
+      onDelete(projectId);
     } catch (error) {
       console.error("Error deleting project:", error);
     }
@@ -34,7 +33,6 @@ const MoreOptions = ({ project, onEdit, onDelete, updateProject}) => {
     // Use the updateProject function passed from Projects component
     updateProject(updatedProject);
   };
-  
 
   const menu = (
     <Menu>
@@ -64,7 +62,7 @@ const MoreOptions = ({ project, onEdit, onDelete, updateProject}) => {
   return (
     <Dropdown overlay={menu} trigger={["click"]} placement="topLeft">
       <span
-        className="text-gray-500 cursor-pointer hover:text-gray-700 text-[18px]"
+        className="text-gray-500 cursor-pointer hover:text-black text-[18px]"
         onClick={(e) => e.stopPropagation()} // Prevent parent click
       >
         <EllipsisOutlined />

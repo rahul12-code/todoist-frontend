@@ -1,5 +1,5 @@
 import React from "react";
-import { useState} from "react";
+import { useState, useEffect } from "react";
 import { colorOptions } from "../ColorOptions";
 import AddProjectModal from "./AddProjectModal";
 import MoreOptions from "./MoreOptions";
@@ -25,6 +25,11 @@ const MyProjectsPage = () => {
   // State to track the search query
   const [searchQuery, setSearchQuery] = useState("");
   const [hoveredProjectId, setHoveredProjectId] = useState(null); // State to track the hovered project
+
+  useEffect(() => {
+    // Reset selectedProjectId when MyProjectsPage is loaded
+    setSelectedProjectId(null);
+  }, [setSelectedProjectId]);
 
   const getHashtagColor = (project) => {
     const color = colorOptions.find((option) => option.value === project.color);
@@ -108,24 +113,25 @@ const MyProjectsPage = () => {
                 onMouseEnter={() => setHoveredProjectId(project.id)}
                 onMouseLeave={() => setHoveredProjectId(null)}
                 onClick={(e) => {
-                  setSelectedProjectId(project.id);
+                  // setSelectedProjectId(project.id);
                   (e) => e.stopPropagation();
                 }}
                 className="group p-2 rounded cursor-pointer flex items-center justify-between gap-2 hover:bg-gray-200"
               >
-                <div className="flex items-center">
-                  <span
-                    className="text-[18px] font-semibold mr-3"
-                    style={{ color: getHashtagColor(project) }}
-                  >
-                    #
-                  </span>
-                  <Link
-                    to={`/my-projects/${project.name}`}
-                  >
-                    {project.name}
+                <div 
+                  className="w-full"
+                  onClick={() => setSelectedProjectId(project.id)}>
+                  <Link to={`/my-projects/${project.name}`}>
+                    <div className="flex items-center">
+                      <span
+                        className="text-[18px] font-semibold mr-2"
+                        style={{ color: getHashtagColor(project) }}
+                      >
+                        #
+                      </span>
+                      <span>{project.name}</span>
+                    </div>
                   </Link>
-                  
                 </div>
 
                 {/* Render MoreOptions dropdown on hover */}

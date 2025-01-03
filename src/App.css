@@ -2,6 +2,7 @@
 .ant-drawer-content-wrapper,
 .ant-drawer-content {
   box-shadow: none !important; /* Ensure no shadow */
+  transition: none;
 }
 
 input[type="checkbox"]:hover {
