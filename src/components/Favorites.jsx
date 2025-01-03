@@ -4,9 +4,7 @@ import { colorOptions } from "../ColorOptions";
 
 import { useProjects } from "./ProjectContext";
 
-const Favorites = (
-  // { favorites, onProjectClick, selectedProjectId }
-) => {
+const Favorites = () => {
 
   const {favorites, selectedProjectId, setSelectedProjectId} = useProjects();
   const [favoritesVisible, setFavoritesVisible] = useState(true);

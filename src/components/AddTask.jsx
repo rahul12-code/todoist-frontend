@@ -2,37 +2,39 @@ import React, { useState, useEffect } from "react";
 import { useProjects } from "./ProjectContext";
 import { Select } from "antd";
 
-const AddTask = ({ onAddTask, onCancel }) => {
-
+const AddTask = ({ onAddTask, onUpdateTask, onCancel, initialData, taskBeingEdited }) => {
   const { api, allProjects, projects, inbox, selectedProjectId } =
     useProjects();
 
-  const [taskContent, setTaskContent] = useState("");
-  const [taskDescription, setTaskDescription] = useState("");
+    console.log(selectedProjectId);
+
+  const [taskContent, setTaskContent] = useState(initialData?.content || "");
+  const [taskDescription, setTaskDescription] = useState(initialData?.description || "");
 
   const [projectId, setProjectId] = useState(
-    selectedProjectId || inbox?.id || (projects[0] && projects[0].id) // Default to selectedProjectId, inbox, or first project
+    initialData?.projectId || selectedProjectId || inbox?.id || (projects[0] && projects[0].id) // Default to selectedProjectId, inbox, or first project
   );
 
-  useEffect(() => {
-    if (selectedProjectId) {
-      setProjectId(selectedProjectId);
-    }
-  }, [selectedProjectId]);
-
-  const handleAddTask = () => {
+  const handleAddorUpdateTask = () => {
     if (!taskContent) {
       alert("Task content cannot be empty!");
       return;
     }
 
-    const newTask = {
-      content: taskContent,
-      description: taskDescription,
-      projectId: selectedProjectId,
-    };
+    const taskData = taskBeingEdited
+        ? {
+              ...initialData,
+              content: taskContent,
+              description: taskDescription,
+              projectId,
+          }
+        : {
+              content: taskContent,
+              description: taskDescription,
+              projectId,
+          };
 
-    onAddTask(newTask);
+    taskBeingEdited ? onUpdateTask(taskData) : onAddTask(taskData);
     onCancel(); // Hide the AddTask form
     setTaskContent("");
     setTaskDescription("");
@@ -40,11 +42,11 @@ const AddTask = ({ onAddTask, onCancel }) => {
 
   const handleProjectChange = (value) => {
     setProjectId(value);
+    console.log(value, "Project ID changed");
   };
 
   return (
-    <div className="add-task-container p-2 mt-4 border-2 border-gray-300 rounded-md shadow-sm">
-      {/* <h3 className="text-lg font-bold mb-2">Add New Task</h3> */}
+    <div className="add-task-container w-full p-2 mt-4 border-2 border-gray-300 rounded-md shadow-sm">
       <input
         type="text"
         placeholder="Task Content"
@@ -61,13 +63,12 @@ const AddTask = ({ onAddTask, onCancel }) => {
       />
       <hr />
 
-      <div className="mt-2 w-full flex flex-row-reverse">
-
+      <div className="mt-2 w-full flex justify-between items-center">
         <Select
           key="project-select"
-          value={projectId || inbox?.id}
+          value={projectId}
           onChange={handleProjectChange}
-          style={{ width: "20%", marginRight: "200px" }}
+          style={{ width: "20%" }} 
           placeholder="Select a project"
         >
           {allProjects.map((project) => (
@@ -77,18 +78,18 @@ const AddTask = ({ onAddTask, onCancel }) => {
           ))}
         </Select>
 
-        <div>
+        <div className="flex space-x-2">
           <button
             onClick={onCancel}
-            className="bg-orange-500 text-white px-2 py-1 mr-2 rounded-md hover:bg-blue-600"
+            className="bg-orange-500 text-white px-2 py-1 rounded-md hover:bg-blue-600"
           >
             Cancel
           </button>
           <button
-            onClick={handleAddTask}
+            onClick={handleAddorUpdateTask}
             className="bg-orange-500 text-white px-2 py-1 rounded-md hover:bg-blue-600"
           >
-            Add Task
+            {taskBeingEdited===null?'Add Task':'Save'}
           </button>
         </div>
       </div>

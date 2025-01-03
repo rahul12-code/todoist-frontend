@@ -22,9 +22,6 @@ const AddTaskModal = ({ open, onClose}) => {
       setProjectId(selectedProjectId);
     }
   }, [selectedProjectId]);
-  
-  // Combine inbox with other projects
-  // const combinedProjects = inbox ? [inbox, ...data] : data;
 
   const handleOk = () => {
     setLoading(true);
@@ -110,7 +107,7 @@ const AddTaskModal = ({ open, onClose}) => {
           value={taskContent}
           onChange={handleContentChange}
           placeholder="Content"
-          className="w-full p-1 placeholder:font-bold placeholder:text-gray-500"
+          className="w-full p-1 placeholder:font-bold placeholder:text-gray-500 focus:outline-none focus:ring-0"
         />
       </div>
       <div className="mb-4">
@@ -119,7 +116,7 @@ const AddTaskModal = ({ open, onClose}) => {
           value={taskDescription}
           onChange={handleDescriptionChange}
           placeholder="Description"
-          className="w-full p-1 placeholder:font-bold placeholder:text-gray-500"
+          className="w-full p-1 placeholder:font-bold placeholder:text-gray-500 focus:outline-none focus:ring-0"
         />
       </div>
     </Modal>

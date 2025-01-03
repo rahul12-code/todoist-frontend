@@ -1,13 +1,10 @@
 import React, { useState } from "react";
 import { Drawer } from "antd";
 import SidebarIcon from "../assets/sidebar19.svg";
-import SidebarList from "./SidebarList";
 import "../App.css";
 import SidebarItems from "./SidebarItems";
 
-const Sidebar = (
-  // {selectedProjectId, setSelectedProjectId}
-) => {
+const Sidebar = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false); //Intially open
   const [drawerWidth, setDrawerWidth] = useState(270);
   const [isResizing, setIsResizing] = useState(false);
@@ -59,24 +56,19 @@ const Sidebar = (
 
       {/* Ant Design Drawer */}
       <Drawer
-        // title="Projects"
         placement="left"
         closable={false}
         mask={false}
         onClose={toggleDrawer}
         open={isDrawerOpen}
-        destroyOnClose={true} // Destroy content when closed
+        destroyOnClose={true} 
         width={drawerWidth}
         style={{
           backgroundColor: "#fcfaf8", // Set background color
-          transition: "none", // Remove sliding animation
         }}
       >
         <div className="mt-10">
-          <SidebarItems 
-            // selectedProjectId={selectedProjectId} 
-            // setSelectedProjectId={setSelectedProjectId}
-          />
+          <SidebarItems/>
         </div>
 
         {/* Resizing Handle */}

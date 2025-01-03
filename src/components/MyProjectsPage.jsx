@@ -1,41 +1,30 @@
 import React from "react";
-import { SearchOutlined } from "@ant-design/icons";
-
-import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useState} from "react";
 import { colorOptions } from "../ColorOptions";
 import AddProjectModal from "./AddProjectModal";
 import MoreOptions from "./MoreOptions";
+import { Link } from "react-router-dom";
 
 import { useProjects } from "./ProjectContext";
 
-const MyProjectsPage = ({
-  // projects,
-  // api,
-  // selectedProjectId,
-  // setSelectedProjectId,
-}) => {
-
-  const { 
-    selectedProjectId, setSelectedProjectId,
-    projects, addProject, updateProject, deleteProject, 
-    projectsmodalVisible, setProjectsModalVisible,
-    selectedColor, setSelectedColor,
-    // hoveredProjectId, setHoveredProjectId,
-    editingProject, setEditingProject 
+const MyProjectsPage = () => {
+  const {
+    setSelectedProjectId,
+    projects,
+    addProject,
+    updateProject,
+    deleteProject,
+    projectsmodalVisible,
+    setProjectsModalVisible,
+    selectedColor,
+    setSelectedColor,
+    editingProject,
+    setEditingProject,
   } = useProjects();
-
-  // const location = useLocation();
-  // console.log(useLocation());
 
   // State to track the search query
   const [searchQuery, setSearchQuery] = useState("");
   const [hoveredProjectId, setHoveredProjectId] = useState(null); // State to track the hovered project
-
-  // const [projectsmodalVisible, setProjectsModalVisible] = useState(false); // State for modal visibility
-  // const [selectedColor, setSelectedColor] = useState("charcoal");
-
-  // const [editingProject, setEditingProject] = useState(null);
 
   const getHashtagColor = (project) => {
     const color = colorOptions.find((option) => option.value === project.color);
@@ -101,7 +90,6 @@ const MyProjectsPage = ({
               setProjectsModalVisible(false);
               resetModalState();
             }}
-            // onProjectAdded={onProjectAdded}
             onProjectAdded={handleProjectAdded}
             onProjectUpdated={handleProjectUpdated}
             editingProject={editingProject}
@@ -121,7 +109,7 @@ const MyProjectsPage = ({
                 onMouseLeave={() => setHoveredProjectId(null)}
                 onClick={(e) => {
                   setSelectedProjectId(project.id);
-                  (e) => e.stopPropagation()
+                  (e) => e.stopPropagation();
                 }}
                 className="group p-2 rounded cursor-pointer flex items-center justify-between gap-2 hover:bg-gray-200"
               >
@@ -132,16 +120,18 @@ const MyProjectsPage = ({
                   >
                     #
                   </span>
-                  {project.name}
+                  <Link
+                    to={`/my-projects/${project.name}`}
+                  >
+                    {project.name}
+                  </Link>
+                  
                 </div>
 
                 {/* Render MoreOptions dropdown on hover */}
                 {hoveredProjectId === project.id && (
                   <MoreOptions
                     project={project}
-                    // api={api}
-                    // setProjects={setProjects}
-                    // content={projects}
                     onEdit={handleEditProject}
                     onDelete={handleProjectDeleted} // Pass delete handler
                     updateProject={handleProjectUpdated}

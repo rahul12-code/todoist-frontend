@@ -1,19 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import AddTaskModal from "./AddTaskModal";
 import AddTask from "./AddTask";
+import { EditOutlined } from "@ant-design/icons";
 
 import { useProjects } from "./ProjectContext";
-import { CheckOutlined } from "@ant-design/icons";
 import "../App.css";
 
 const SingleProjectPage = () => {
-  const {
-    api,
-    allProjects,
-    updateProject,
-    selectedProjectId,
-  } = useProjects();
+  const { api, allProjects, updateProject, selectedProjectId } = useProjects();
 
   const { projectName } = useParams();
   const [tasks, setTasks] = useState([]);
@@ -23,8 +17,9 @@ const SingleProjectPage = () => {
 
   const [isAddTaskVisible, setIsAddTaskVisible] = useState(false); // State to control AddTask visibility
 
+  const [taskBeingEdited, setTaskBeingEdited] = useState(null); // Track the task being edited
+
   useEffect(() => {
-    // Reset editedProjectName when projectName or selectedProjectId changes
     setEditedProjectName(projectName);
   }, [projectName, selectedProjectId]);
 
@@ -67,9 +62,10 @@ const SingleProjectPage = () => {
   const handleAddTask = async (newTask) => {
     try {
       const addedTask = await api.addTask(newTask);
-      setTasks((prevTasks) => [...prevTasks, addedTask]);
-      setIsAddTaskVisible(false);  // Hide the AddTask component after adding the task
-
+      if (selectedProjectId === newTask.projectId) {
+        setTasks((prevTasks) => [...prevTasks, addedTask]);
+      }
+      setIsAddTaskVisible(false); // Hide the AddTask component after adding the task
     } catch (error) {
       console.error("Error adding task:", error);
     }
@@ -81,6 +77,20 @@ const SingleProjectPage = () => {
       setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
     } catch (error) {
       console.error("Error deleting task:", error);
+    }
+  };
+
+  const handleUpdateTask = async (updatedTask) => {
+    try {
+      await api.updateTask(updatedTask.id, updatedTask);
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === updatedTask.id ? { ...task, ...updatedTask } : task
+        )
+      );
+      setTaskBeingEdited(null);
+    } catch (error) {
+      console.error("Error updating task:", error);
     }
   };
 
@@ -107,25 +117,44 @@ const SingleProjectPage = () => {
         <ul className="list-none p-0">
           {tasks.map((task) => (
             <li
-              key={task.id}
-              className="flex items-center p-4 text-[16px] border-b border-gray-300 cursor-pointer "
-            >
-              <input
-                type="checkbox"
-                className="relative mr-3 w-[18px] h-[18px] rounded-full cursor-pointer appearance-none border border-gray-400"
-                onClick={() => handleDeleteTask(task.id)}
+            key={task.id}
+            className="flex items-center p-4 text-[16px] border-b border-gray-300 cursor-pointer rounded-md group"
+          >
+            {taskBeingEdited?.id === task.id ? (
+              <AddTask
+                onUpdateTask={handleUpdateTask}
+                onCancel={() => setTaskBeingEdited(null)}
+                initialData={task}
+                taskBeingEdited={taskBeingEdited}
               />
-              {task.content}
-            </li>
+            ) : (
+              <>
+                <input
+                  type="checkbox"
+                  className="relative mr-3 w-[18px] h-[18px] rounded-full cursor-pointer appearance-none border border-gray-400"
+                  onClick={() => handleDeleteTask(task.id)}
+                />
+                <div className="flex flex-col flex-grow">
+                  <p className="text-[16px]">{task.content}</p>
+                  <p className="text-[13px] text-gray-600">
+                    {task.description}
+                  </p>
+                </div>
+                <EditOutlined
+                  className="text-gray-600 text-[20px] hover:text-blue-500 hidden group-hover:block"
+                  onClick={() => setTaskBeingEdited(task)}
+                />
+              </>
+            )}
+          </li>
           ))}
         </ul>
 
+        {/* For Add Task */}
         {isAddTaskVisible ? (
           <AddTask
             onAddTask={handleAddTask}
             onCancel={() => setIsAddTaskVisible(false)} // Handle cancel action
-
-            selectedProjectId={selectedProjectId}
           />
         ) : (
           <div
@@ -140,7 +169,6 @@ const SingleProjectPage = () => {
             </span>
           </div>
         )}
-
       </div>
     </div>
   );

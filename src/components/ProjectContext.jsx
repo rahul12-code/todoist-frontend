@@ -16,9 +16,6 @@ export const ProjectProvider = ({ children }) => {
   const [hoveredProjectId, setHoveredProjectId] = useState(null);
   const [editingProject, setEditingProject] = useState(null);
 
-  const [tasksmodalVisible, setTasksModalVisible] = useState(false);
-
-
   useEffect(() => {
     api
       .getProjects()
@@ -79,9 +76,6 @@ export const ProjectProvider = ({ children }) => {
 
         editingProject,
         setEditingProject,
-
-        tasksmodalVisible, 
-        setTasksModalVisible
       }}
     >
       {children}

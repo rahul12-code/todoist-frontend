@@ -1,13 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Input, Button, Switch, Select } from "antd";
-// import { TodoistApi } from "@doist/todoist-api-typescript";
 import ColorSelect from "./ColorSelect";
-
-// Todoist API instance
-// const api = new TodoistApi("7a41b607067ae6d30e04543770815e7f7aeee18e");
-
 import { useProjects } from "./ProjectContext";
-
 
 const AddProjectModal = ({
   open,
@@ -49,8 +43,6 @@ const AddProjectModal = ({
       api
         .updateProject(editingProject.id, projectData)
         .then((updatedProject) => {
-          console.log("Project updated:", updatedProject);
-          // onProjectUpdated({ ...editingProject, ...projectData });
           onProjectUpdated(updatedProject);
           onClose();
         })
@@ -61,7 +53,6 @@ const AddProjectModal = ({
         .addProject(projectData)
         .then((newProject) => {
           console.log("Project added:", newProject);
-          // onProjectAdded(newProject);
           onProjectAdded(newProject);
           onClose();
         })

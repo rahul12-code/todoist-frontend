@@ -24,8 +24,4 @@ dist-ssr
 *.sw?
 
 Trail.js 
-SidebarTrial.jsx
-ProjectsListTrial.jsx
-Trial.jsx
-EmptyComponent.jsx
-SidebarList.jsx
+./src/components/EmptyComponent.jsx

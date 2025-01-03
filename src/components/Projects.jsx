@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 
-// import { TodoistApi } from "@doist/todoist-api-typescript";
 import AddProjectModal from "./AddProjectModal";
 import { colorOptions } from "../ColorOptions";
 import MoreOptions from "./MoreOptions";
@@ -9,14 +8,7 @@ import { Link } from "react-router-dom";
 
 import { useProjects } from "./ProjectContext";
 
-// const api = new TodoistApi("7a41b607067ae6d30e04543770815e7f7aeee18e");
-
-const Projects = ({
-  // onProjectClick,
-  // selectedProjectId,
-  // onProjectAdded,
-}) => {
-  // console.log(content);
+const Projects = () => {
 
   const { 
     projects, addProject, updateProject, deleteProject, 
@@ -26,13 +18,7 @@ const Projects = ({
     hoveredProjectId, setHoveredProjectId,
     editingProject, setEditingProject } = useProjects();
 
-  // const [projects, setProjects] = useState(content); // State for projects
   const [projectsVisible, setProjectsVisible] = useState(true);
-  // const [projectsmodalVisible, setProjectsModalVisible] = useState(false);
-  // const [selectedColor, setSelectedColor] = useState("charcoal");
-  // const [hoveredProjectId, setHoveredProjectId] = useState(null);
-
-  // const [editingProject, setEditingProject] = useState(null);
 
   const getHashtagColor = (project) => {
     const color = colorOptions.find((option) => option.value === project.color);
@@ -43,10 +29,6 @@ const Projects = ({
     setSelectedColor("charcoal");
     setEditingProject(null);
   };
-
-  // useEffect(() => {
-  //   setProjects(content);
-  // }, [content]);
 
   const handleEditProject = (project) => {
     setEditingProject(project); 
@@ -64,19 +46,6 @@ const Projects = ({
   const handleProjectDeleted = (projectId) => {
     deleteProject(projectId); // Use context to delete the project
   };
-
-  // const handleProjectDelete = (projectId) => {
-  //   deleteProject(projectId);
-  // };
-
-  // const handleProjectUpdated = (updatedProject) => {
-  //   // Update the project list with the edited project
-  //   setProjects((prevProjects) =>
-  //     prevProjects.map((proj) =>
-  //       proj.id === updatedProject.id ? updatedProject : proj
-  //     )
-  //   );
-  // };
 
   return (
     <div>
@@ -111,13 +80,8 @@ const Projects = ({
           setProjectsModalVisible(false);
           resetModalState();
         }}
-        // onSave={(newProject) => {
-        //   addProject(newProject)
-        //   resetModalState();
-        // }}
         onProjectAdded={handleProjectAdded}
         onProjectUpdated={handleProjectUpdated}
-        // onProjectUpdated={handleProjectUpdated} // Handle project updates
         editingProject={editingProject} // Pass project to be edited
         selectedColor={selectedColor}
         setSelectedColor={setSelectedColor}
@@ -159,7 +123,6 @@ const Projects = ({
                   <div className="group-hover:opacity-100">
                     <MoreOptions
                       project={project}
-                      // api={api}
                       onEdit={handleEditProject} // Pass edit handler
                       onDelete={handleProjectDeleted} // Pass delete handler
                       updateProject={handleProjectUpdated}
