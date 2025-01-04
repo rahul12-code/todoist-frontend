@@ -4,6 +4,8 @@ import { colorOptions } from "../ColorOptions";
 import AddProjectModal from "./AddProjectModal";
 import MoreOptions from "./MoreOptions";
 import { Link } from "react-router-dom";
+import { SearchOutlined } from "@ant-design/icons";
+import { Input } from "antd";
 
 import { useProjects } from "./ProjectContext";
 
@@ -69,12 +71,13 @@ const MyProjectsPage = () => {
         <div className="p-6 rounded-lg w-[50%] absolute top-20">
           <h1 className="text-2xl font-bold mb-4">My Projects</h1>
           <div className="relative mb-2 ">
-            <input
+            <Input
               type="text"
               placeholder="Search projects"
               className="border rounded px-3 py-2 w-full"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)} // Update searchQuery on input change
+              onChange={(e) => setSearchQuery(e.target.value)} // Update searchQuery on Input change
+              prefix={<SearchOutlined />}
             />
           </div>
 

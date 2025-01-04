@@ -8,10 +8,17 @@ import TickMark from "../assets/tick-mark.svg";
 import "../App.css";
 
 const SingleProjectPage = () => {
-  const { api, allProjects, updateProject, selectedProjectId, tasks, setTasks } = useProjects();
+  const {
+    api,
+    allProjects,
+    updateProject,
+    setSelectedProjectId,
+    selectedProjectId,
+    tasks,
+    setTasks,
+  } = useProjects();
 
   const { projectName } = useParams();
-  // const [tasks, setTasks] = useState([]);
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedProjectName, setEditedProjectName] = useState(projectName);
@@ -19,6 +26,7 @@ const SingleProjectPage = () => {
   const [isAddTaskVisible, setIsAddTaskVisible] = useState(false); // State to control AddTask visibility
 
   const [taskBeingEdited, setTaskBeingEdited] = useState(null); // Track the task being edited
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setEditedProjectName(projectName);
@@ -29,6 +37,7 @@ const SingleProjectPage = () => {
   }, [api, selectedProjectId]);
 
   const fetchTasks = async () => {
+    setLoading(true);
     try {
       const allTasks = await api.getTasks();
       const filteredTasks = allTasks.filter(
@@ -37,8 +46,19 @@ const SingleProjectPage = () => {
       setTasks(filteredTasks);
     } catch (error) {
       console.error("Error fetching tasks:", error);
+    } finally {
+      setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const matchedProject = allProjects.find(
+      (project) => project.name === projectName
+    );
+    if (matchedProject) {
+      setSelectedProjectId(matchedProject.id); // Set the projectId in state
+    }
+  }, [allProjects, projectName]);
 
   const handleEditBlur = async () => {
     setIsEditing(false);
@@ -115,52 +135,55 @@ const SingleProjectPage = () => {
           </h1>
         )}
 
-        <ul className="list-none p-0">
-          {tasks.map((task) => (
-            <li
-              key={task.id}
-              className="flex items-center p-4 text-[16px] border-b border-gray-300 cursor-pointer rounded-md group"
-            >
-              {taskBeingEdited?.id === task.id ? (
-                <AddTask
-                  onUpdateTask={handleUpdateTask}
-                  onCancel={() => setTaskBeingEdited(null)}
-                  initialData={task}
-                  taskBeingEdited={taskBeingEdited}
-                />
-              ) : (
-                <>
-                
-                  <div className="relative">
-                    <input
-                      type="checkbox"
-                      className="absolute opacity-0 w-[18px] h-[18px] cursor-pointer"
-                      onClick={() => handleDeleteTask(task.id)}
-                    />
-                    <div className="w-[18px] h-[18px] rounded-full border border-gray-400 flex justify-center items-center cursor-pointer">
-                      <img
-                        src={TickMark} 
-                        alt="Tick Mark"
-                        className="hidden group-hover:block w-[17px] h-[17px]"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col flex-grow ml-3">
-                    <p className="text-[16px]">{task.content}</p>
-                    <p className="text-[13px] text-gray-600">
-                      {task.description}
-                    </p>
-                  </div>
-                  <EditOutlined
-                    className="text-gray-600 text-[20px] hover:text-blue-500 hidden group-hover:block"
-                    onClick={() => setTaskBeingEdited(task)}
+        {loading ? (
+          <div className="text-center text-[20px]">Loading...</div> // Loading indicator
+        ) : (
+          <ul className="list-none p-0">
+            {tasks.map((task) => (
+              <li
+                key={task.id}
+                className="flex items-center p-4 px-0 text-[16px] border-b border-gray-300 cursor-pointer group"
+              >
+                {taskBeingEdited?.id === task.id ? (
+                  <AddTask
+                    onUpdateTask={handleUpdateTask}
+                    onCancel={() => setTaskBeingEdited(null)}
+                    initialData={task}
+                    taskBeingEdited={taskBeingEdited}
                   />
-                </>
-              )}
-            </li>
-          ))}
-        </ul>
+                ) : (
+                  <>
+                    <div className="relative">
+                      <input
+                        type="checkbox"
+                        className="absolute opacity-0 w-[18px] h-[18px] cursor-pointer"
+                        onClick={() => handleDeleteTask(task.id)}
+                      />
+                      <div className="w-[18px] h-[18px] rounded-full border border-gray-400 flex justify-center items-center cursor-pointer">
+                        <img
+                          src={TickMark}
+                          alt="Tick Mark"
+                          className="hidden group-hover:block w-[17px] h-[17px]"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col flex-grow ml-3">
+                      <p className="text-[16px]">{task.content}</p>
+                      <p className="text-[13px] text-gray-600">
+                        {task.description}
+                      </p>
+                    </div>
+                    <EditOutlined
+                      className="text-gray-600 text-[20px] hover:text-blue-500 hidden group-hover:block"
+                      onClick={() => setTaskBeingEdited(task)}
+                    />
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
 
         {/* For Add Task */}
         {isAddTaskVisible ? (
@@ -171,7 +194,7 @@ const SingleProjectPage = () => {
           />
         ) : (
           <div
-            className="p-3 group flex items-baseline cursor-pointer text-gray-600 gap-1"
+            className="p-4 px-0 group flex items-baseline cursor-pointer text-gray-600 gap-1"
             onClick={() => setIsAddTaskVisible(true)} // Show AddTask component when clicked
           >
             <span className="flex justify-center items-center w-[25px] h-[25px] rounded-full text-[20px] group-hover:bg-[#ab2307] group-hover:text-white">

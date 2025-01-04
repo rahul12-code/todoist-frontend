@@ -103,7 +103,6 @@ const Projects = () => {
               key={project.id}
               onMouseEnter={() => setHoveredProjectId(project.id)}
               onMouseLeave={() => setHoveredProjectId(null)}
-              // onClick={() => setSelectedProjectId(project.id)}
               className={`group p-2 rounded cursor-pointer flex items-center justify-between ${
                 selectedProjectId === project.id
                   ? "bg-orange-200 text-orange-700"

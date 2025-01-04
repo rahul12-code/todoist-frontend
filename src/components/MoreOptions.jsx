@@ -25,13 +25,18 @@ const MoreOptions = ({ project, onEdit, onDelete, updateProject }) => {
 
   // Handle favorite project toggle
   const handleFavoriteProject = async (project) => {
-    const updatedProject = {
-      ...project,
-      isFavorite: !project.isFavorite, // Toggle the favorite status
-    };
+    try {
+      const updatedProject = {
+        ...project,
+        isFavorite: !project.isFavorite, // Toggle the favorite status
+      };
+      await api.updateProject(project.id,updatedProject)
 
-    // Use the updateProject function passed from Projects component
-    updateProject(updatedProject);
+      // Use the updateProject function passed from Projects component
+      updateProject(updatedProject);
+    } catch (error) {
+      console.error("Error Updating project:", error);
+    }
   };
 
   const menu = (

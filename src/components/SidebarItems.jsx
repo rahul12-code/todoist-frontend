@@ -36,7 +36,7 @@ const SidebarItems = () => {
         <div className="mb-4">
           <ul>
             <li
-              onClick={() => setSelectedProjectId(inbox.id)}
+              // onClick={() => setSelectedProjectId(inbox.id)}
               className={`font-medium text-[17px] p-2 pl-0 rounded cursor-pointer ${
                 selectedProjectId === inbox.id
                   ? "bg-orange-200 text-orange-700"
