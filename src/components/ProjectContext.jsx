@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useReducer } from "react";
 import { TodoistApi } from "@doist/todoist-api-typescript";
 
 const ProjectContext = createContext();
@@ -7,80 +7,83 @@ export const useProjects = () => useContext(ProjectContext);
 
 const api = new TodoistApi("7a41b607067ae6d30e04543770815e7f7aeee18e");
 
+// Initial state
+const initialState = {
+  allProjects: [],
+  selectedProjectId: null,
+  projectsModalVisible: false,
+  selectedColor: "charcoal",
+  hoveredProjectId: null,
+  editingProject: null,
+  tasks: [],
+};
+
+// Reducer function
+const projectReducer = (state, action) => {
+  switch (action.type) {
+    case "SET_PROJECTS":
+      return { ...state, allProjects: action.payload };
+    case "SET_SELECTED_PROJECT_ID":
+      return { ...state, selectedProjectId: action.payload };
+    case "TOGGLE_PROJECTS_MODAL":
+      return { ...state, projectsModalVisible: !state.projectsModalVisible };
+    case "SET_SELECTED_COLOR":
+      return { ...state, selectedColor: action.payload };
+    case "SET_HOVERED_PROJECT_ID":
+      return { ...state, hoveredProjectId: action.payload };
+    case "SET_EDITING_PROJECT":
+      return { ...state, editingProject: action.payload };
+    case "SET_TASKS":
+      return { ...state, tasks: action.payload };
+    case "ADD_PROJECT":
+      return { ...state, allProjects: [...state.allProjects, action.payload] };
+    case "DELETE_PROJECT":
+      return {
+        ...state,
+        allProjects: state.allProjects.filter(
+          (project) => project.id !== action.payload
+        ),
+      };
+    case "UPDATE_PROJECT":
+      return {
+        ...state,
+        allProjects: state.allProjects.map((project) =>
+          project.id === action.payload.id ? action.payload : project
+        ),
+      };
+    default:
+      return state;
+  }
+};
+
 export const ProjectProvider = ({ children }) => {
-  const [allProjects, setAllProjects] = useState([]);
-  const [selectedProjectId, setSelectedProjectId] = useState(null);
-
-  const [projectsmodalVisible, setProjectsModalVisible] = useState(false);
-  const [selectedColor, setSelectedColor] = useState("charcoal");
-  const [hoveredProjectId, setHoveredProjectId] = useState(null);
-  const [editingProject, setEditingProject] = useState(null);
-
-  const [tasks, setTasks] = useState([]);
+  const [state, dispatch] = useReducer(projectReducer, initialState);
+  const [Hello]=1;
 
   useEffect(() => {
     api
       .getProjects()
       .then((fetchedProjects) => {
-        setAllProjects(fetchedProjects);
+        dispatch({ type: "SET_PROJECTS", payload: fetchedProjects });
       })
       .catch((error) => console.error("Error fetching projects:", error));
   }, []);
 
   // Segregation logic
-  const inbox = allProjects.find((project) => project.name === "Inbox");
-  const favorites = allProjects.filter((project) => project.isFavorite);
-  const projects = allProjects.filter(
+  const inbox = state.allProjects.find((project) => project.name === "Inbox");
+  const favorites = state.allProjects.filter((project) => project.isFavorite);
+  const projects = state.allProjects.filter(
     (project) => project.name !== "Inbox"
   );
-
-  const addProject = (newProject) => {
-    setAllProjects((prevProjects) => [...prevProjects, newProject]);
-  };
-
-  const deleteProject = (projectId) => {
-    setAllProjects((prevProjects) =>
-      prevProjects.filter((project) => project.id !== projectId)
-    );
-  };
-
-  const updateProject = (updatedProject) => {
-    setAllProjects((prevProjects) =>
-      prevProjects.map((project) =>
-        project.id === updatedProject.id ? updatedProject : project
-      )
-    );
-  };
 
   return (
     <ProjectContext.Provider
       value={{
-        api,
-        allProjects,
+        state,
+        dispatch,
         inbox,
         favorites,
         projects,
-        addProject,
-        deleteProject,
-        updateProject,
-
-        selectedProjectId,
-        setSelectedProjectId,
-
-        projectsmodalVisible,
-        setProjectsModalVisible,
-
-        selectedColor,
-        setSelectedColor,
-
-        hoveredProjectId,
-        setHoveredProjectId,
-
-        editingProject,
-        setEditingProject,
-
-        tasks,
-        setTasks,
       }}
     >
       {children}
