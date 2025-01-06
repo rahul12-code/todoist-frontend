@@ -2,18 +2,30 @@ import React, { useState, useEffect } from "react";
 import { useProjects } from "./ProjectContext";
 import { Select } from "antd";
 
-const AddTask = ({ onAddTask, onUpdateTask, onCancel, initialData, taskBeingEdited }) => {
-  const { allProjects, projects, inbox, selectedProjectId } =
-    useProjects();
-
-    console.log(selectedProjectId);
+const AddTask = ({
+  onAddTask,
+  onUpdateTask,
+  onCancel,
+  initialData,
+  taskBeingEdited,
+}) => {
+  const {
+    projects,
+    inbox,
+    state: { allProjects,selectedProjectId },
+  } = useProjects();
 
   const [taskContent, setTaskContent] = useState(initialData?.content || "");
-  const [taskDescription, setTaskDescription] = useState(initialData?.description || "");
-
-  const [projectId, setProjectId] = useState(
-    initialData?.projectId || selectedProjectId || inbox?.id || (projects[0] && projects[0].id) // Default to selectedProjectId, inbox, or first project
+  const [taskDescription, setTaskDescription] = useState(
+    initialData?.description || ""
   );
+
+  const [projectId, setProjectId] = useState(null);
+  useEffect(() => {
+    setProjectId(
+      selectedProjectId || inbox?.id || (projects[0] && projects[0].id)
+    );
+  }, [selectedProjectId, inbox, projects]);
 
   const handleAddorUpdateTask = () => {
     if (!taskContent) {
@@ -22,17 +34,17 @@ const AddTask = ({ onAddTask, onUpdateTask, onCancel, initialData, taskBeingEdit
     }
 
     const taskData = taskBeingEdited
-        ? {
-              ...initialData,
-              content: taskContent,
-              description: taskDescription,
-              projectId,
-          }
-        : {
-              content: taskContent,
-              description: taskDescription,
-              projectId,
-          };
+      ? {
+          ...initialData,
+          content: taskContent,
+          description: taskDescription,
+          projectId,
+        }
+      : {
+          content: taskContent,
+          description: taskDescription,
+          projectId,
+        };
 
     taskBeingEdited ? onUpdateTask(taskData) : onAddTask(taskData);
     onCancel(); // Hide the AddTask form
@@ -68,7 +80,7 @@ const AddTask = ({ onAddTask, onUpdateTask, onCancel, initialData, taskBeingEdit
           key="project-select"
           value={projectId}
           onChange={handleProjectChange}
-          style={{ width: "20%" }} 
+          style={{ width: "20%" }}
           placeholder="Select a project"
         >
           {allProjects.map((project) => (
@@ -89,7 +101,7 @@ const AddTask = ({ onAddTask, onUpdateTask, onCancel, initialData, taskBeingEdit
             onClick={handleAddorUpdateTask}
             className="bg-[#ab2307] text-white px-2 py-1 rounded-md hover:bg-blue-600"
           >
-            {taskBeingEdited===null?'Add Task':'Save'}
+            {taskBeingEdited === null ? "Add Task" : "Save"}
           </button>
         </div>
       </div>

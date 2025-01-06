@@ -9,21 +9,11 @@ import { Link } from "react-router-dom";
 import { useProjects } from "./ProjectContext";
 
 const Projects = () => {
+
   const {
     projects,
-    addProject,
-    updateProject,
-    deleteProject,
-    selectedProjectId,
-    setSelectedProjectId,
-    projectsmodalVisible,
-    setProjectsModalVisible,
-    selectedColor,
-    setSelectedColor,
-    hoveredProjectId,
-    setHoveredProjectId,
-    editingProject,
-    setEditingProject,
+    dispatch,
+    state: { selectedProjectId, projectsModalVisible, selectedColor, editingProject, hoveredProjectId },
   } = useProjects();
 
   const [projectsVisible, setProjectsVisible] = useState(true);
@@ -34,25 +24,25 @@ const Projects = () => {
   };
 
   const resetModalState = () => {
-    setSelectedColor("charcoal");
-    setEditingProject(null);
+    dispatch({ type: "SET_SELECTED_COLOR", payload: "charcoal" });
+    dispatch({ type: "SET_EDITING_PROJECT", payload: null });
   };
 
   const handleEditProject = (project) => {
-    setEditingProject(project);
-    setProjectsModalVisible(true); // Open the modal
-  };
-
-  const handleProjectUpdated = (updatedProject) => {
-    updateProject(updatedProject); // Use context to update the project
+    dispatch({ type: "SET_EDITING_PROJECT", payload: project });
+    dispatch({ type: "TOGGLE_PROJECTS_MODAL" });
   };
 
   const handleProjectAdded = (newProject) => {
-    addProject(newProject); // Use context to add the project
+    dispatch({ type: "ADD_PROJECT", payload: newProject });
+  };
+
+  const handleProjectUpdated = (updatedProject) => {
+    dispatch({ type: "UPDATE_PROJECT", payload: updatedProject });
   };
 
   const handleProjectDeleted = (projectId) => {
-    deleteProject(projectId); // Use context to delete the project
+    dispatch({ type: "DELETE_PROJECT", payload: projectId });
   };
 
   return (
@@ -69,7 +59,7 @@ const Projects = () => {
         <div className="flex gap-2 text-gray-600 items-center">
           <span
             className="text-gray-500 text-[22px] px-2 hover:text-gray-600"
-            onClick={() => setProjectsModalVisible(true)}
+            onClick={() => dispatch({ type: "TOGGLE_PROJECTS_MODAL" })}
           >
             +
           </span>
@@ -83,16 +73,18 @@ const Projects = () => {
       </div>
 
       <AddProjectModal
-        open={projectsmodalVisible}
+        open={projectsModalVisible}
         onClose={() => {
-          setProjectsModalVisible(false);
+          dispatch({ type: "TOGGLE_PROJECTS_MODAL" });
           resetModalState();
         }}
         onProjectAdded={handleProjectAdded}
         onProjectUpdated={handleProjectUpdated}
         editingProject={editingProject} // Pass project to be edited
         selectedColor={selectedColor}
-        setSelectedColor={setSelectedColor}
+        setSelectedColor={(color) =>
+          dispatch({ type: "SET_SELECTED_COLOR", payload: color })
+        }
       />
 
       {/* Projects Section */}
@@ -101,8 +93,8 @@ const Projects = () => {
           {projects.map((project) => (
             <li
               key={project.id}
-              onMouseEnter={() => setHoveredProjectId(project.id)}
-              onMouseLeave={() => setHoveredProjectId(null)}
+              onMouseEnter={() => dispatch({type:'SET_HOVERED_PROJECT_ID',payload:project.id})}
+              onMouseLeave={() => dispatch({type:'SET_HOVERED_PROJECT_ID',payload:null})}
               className={`group p-2 rounded cursor-pointer flex items-center justify-between ${
                 selectedProjectId === project.id
                   ? "bg-orange-200 text-orange-700"
@@ -111,7 +103,9 @@ const Projects = () => {
             >
               <div 
                 className="w-full"
-                onClick={() => setSelectedProjectId(project.id)}
+                onClick={() =>
+                  dispatch({ type: "SET_SELECTED_PROJECT_ID", payload: project.id })
+                }
                 >
                 <Link to={`/my-projects/${project.name}`}>
                   <div className="flex items-center">

@@ -58,7 +58,6 @@ const projectReducer = (state, action) => {
 
 export const ProjectProvider = ({ children }) => {
   const [state, dispatch] = useReducer(projectReducer, initialState);
-  const [Hello]=1;
 
   useEffect(() => {
     api
@@ -84,6 +83,7 @@ export const ProjectProvider = ({ children }) => {
         inbox,
         favorites,
         projects,
+        api,
       }}
     >
       {children}

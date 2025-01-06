@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import AddTask from "./AddTask";
 import { EditOutlined } from "@ant-design/icons";
-
 import { useProjects } from "./ProjectContext";
 import TickMark from "../assets/tick-mark.svg";
 import "../App.css";
@@ -10,18 +9,12 @@ import "../App.css";
 const SingleProjectPage = () => {
   const {
     api,
-    allProjects,
-    updateProject,
-    setSelectedProjectId,
-    selectedProjectId,
-    tasks,
-    setTasks,
+    projects,
+    dispatch,
+    state: { selectedProjectId, tasks },
   } = useProjects();
 
   const { projectName } = useParams();
-
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedProjectName, setEditedProjectName] = useState(projectName);
 
   const [isAddTaskVisible, setIsAddTaskVisible] = useState(false); // State to control AddTask visibility
 
@@ -29,8 +22,13 @@ const SingleProjectPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setEditedProjectName(projectName);
-  }, [projectName, selectedProjectId]);
+    const matchedProject = projects.find(
+      (project) => project.name === projectName
+    );
+    if (matchedProject) {
+      dispatch({ type: "SET_SELECTED_PROJECT_ID", payload: matchedProject.id });
+    }
+  }, [projectName,tasks]);
 
   useEffect(() => {
     fetchTasks();
@@ -43,7 +41,7 @@ const SingleProjectPage = () => {
       const filteredTasks = allTasks.filter(
         (task) => task.projectId === selectedProjectId
       );
-      setTasks(filteredTasks);
+      dispatch({ type: "SET_TASKS", payload: filteredTasks });
     } catch (error) {
       console.error("Error fetching tasks:", error);
     } finally {
@@ -51,40 +49,15 @@ const SingleProjectPage = () => {
     }
   };
 
-  useEffect(() => {
-    const matchedProject = allProjects.find(
-      (project) => project.name === projectName
-    );
-    if (matchedProject) {
-      setSelectedProjectId(matchedProject.id); // Set the projectId in state
-    }
-  }, [allProjects, projectName]);
-
-  const handleEditBlur = async () => {
-    setIsEditing(false);
-    if (editedProjectName !== projectName) {
-      try {
-        // Update project name in the API
-        await api.updateProject(selectedProjectId, { name: editedProjectName });
-
-        // Find and update the project in the local state
-        const updatedProject = allProjects.find(
-          (project) => project.id === selectedProjectId
-        );
-        if (updatedProject) {
-          updateProject({ ...updatedProject, name: editedProjectName });
-        }
-      } catch (error) {
-        console.error("Error updating project name:", error);
-      }
-    }
-  };
+  if (!projects.some((project) => project.id === selectedProjectId)) {
+    return <div className=" flex justify-center items-center text-2xl relative top-52">No project found!</div>;
+  }
 
   const handleAddTask = async (newTask) => {
     try {
       const addedTask = await api.addTask(newTask);
       if (selectedProjectId === newTask.projectId) {
-        setTasks((prevTasks) => [...prevTasks, addedTask]);
+        dispatch({ type: "SET_TASKS", payload: [...tasks, addedTask] });
       }
       setIsAddTaskVisible(false); // Hide the AddTask component after adding the task
     } catch (error) {
@@ -95,7 +68,10 @@ const SingleProjectPage = () => {
   const handleDeleteTask = async (taskId) => {
     try {
       await api.deleteTask(taskId);
-      setTasks((prevTasks) => prevTasks.filter((task) => task.id !== taskId));
+      dispatch({
+        type: "SET_TASKS",
+        payload: tasks.filter((task) => task.id !== taskId),
+      });
     } catch (error) {
       console.error("Error deleting task:", error);
     }
@@ -103,12 +79,13 @@ const SingleProjectPage = () => {
 
   const handleUpdateTask = async (updatedTask) => {
     try {
-      await api.updateTask(updatedTask.id, updatedTask);
-      setTasks((prevTasks) =>
-        prevTasks.map((task) =>
+      await api.updateTask(updatedTask.id, updatedTask); 
+      dispatch({
+        type: "SET_TASKS",
+        payload: tasks.map((task) =>
           task.id === updatedTask.id ? { ...task, ...updatedTask } : task
-        )
-      );
+        ),
+      });
       setTaskBeingEdited(null);
     } catch (error) {
       console.error("Error updating task:", error);
@@ -118,22 +95,9 @@ const SingleProjectPage = () => {
   return (
     <div className="p-5 font-sans flex flex-col justify-center items-center h-screen w-full">
       <div className="w-[45%] absolute top-20">
-        {isEditing ? (
-          <input
-            className="text-2xl font-bold p-3 w-full border border-gray-300 rounded"
-            value={editedProjectName}
-            onChange={(e) => setEditedProjectName(e.target.value)}
-            onBlur={handleEditBlur}
-            autoFocus
-          />
-        ) : (
-          <h1
-            className="text-2xl font-bold p-3 hover:cursor-pointer hover:border"
-            onClick={() => setIsEditing(true)}
-          >
-            {editedProjectName}
-          </h1>
-        )}
+        <h1 className="text-2xl font-bold p-3 hover:cursor-pointer">
+          {projectName}
+        </h1>
 
         {loading ? (
           <div className="text-center text-[20px]">Loading...</div> // Loading indicator

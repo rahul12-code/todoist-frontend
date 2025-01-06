@@ -3,8 +3,7 @@ import { Select } from "antd";
 import { colorOptions } from "../ColorOptions"; // Importing color options
 
 const ColorSelect = ({selectedColor, setSelectedColor}) => {
-    console.log(selectedColor)
-    
+
   return (
     <div className="mt-4">
       <label className="font-semibold">Color</label>

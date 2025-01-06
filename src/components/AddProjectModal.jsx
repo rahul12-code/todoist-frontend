@@ -33,7 +33,7 @@ const AddProjectModal = ({
 
   const handleAddOrUpdateProject = () => {
     const projectData = {
-      name: projectName,
+      name: projectName.trim(),
       isFavorite: isFavorite,
       color: selectedColor,
     };

@@ -7,19 +7,11 @@ import { useProjects } from "./ProjectContext";
 import { Link } from "react-router-dom";
 
 const Favorites = () => {
+
   const {
     favorites,
-    addProject,
-    updateProject,
-    deleteProject,
-    selectedProjectId,
-    setSelectedProjectId,
-    projectsmodalVisible,
-    setProjectsModalVisible,
-    selectedColor,
-    setSelectedColor,
-    editingProject,
-    setEditingProject,
+    dispatch,
+    state: { selectedProjectId, projectsModalVisible, selectedColor, editingProject},
   } = useProjects();
 
   const [favoritesVisible, setFavoritesVisible] = useState(true);
@@ -31,25 +23,25 @@ const Favorites = () => {
   };
 
   const resetModalState = () => {
-    setSelectedColor("charcoal");
-    setEditingProject(null);
+    dispatch({ type: "SET_SELECTED_COLOR", payload: "charcoal" });
+    dispatch({ type: "SET_EDITING_PROJECT", payload: null });
   };
 
   const handleEditProject = (project) => {
-    setEditingProject(project);
-    setProjectsModalVisible(true); // Open the modal
-  };
-
-  const handleProjectUpdated = (updatedProject) => {
-    updateProject(updatedProject); // Use context to update the project
+    dispatch({ type: "SET_EDITING_PROJECT", payload: project });
+    dispatch({ type: "TOGGLE_PROJECTS_MODAL" });
   };
 
   const handleProjectAdded = (newProject) => {
-    addProject(newProject); // Use context to add the project
+    dispatch({ type: "ADD_PROJECT", payload: newProject });
+  };
+
+  const handleProjectUpdated = (updatedProject) => {
+    dispatch({ type: "UPDATE_PROJECT", payload: updatedProject });
   };
 
   const handleProjectDeleted = (projectId) => {
-    deleteProject(projectId); // Use context to delete the project
+    dispatch({ type: "DELETE_PROJECT", payload: projectId });
   };
 
   return (
@@ -67,16 +59,18 @@ const Favorites = () => {
           </div>
 
           <AddProjectModal
-            open={projectsmodalVisible}
+            open={projectsModalVisible}
             onClose={() => {
-              setProjectsModalVisible(false);
+              dispatch({ type: "TOGGLE_PROJECTS_MODAL" });
               resetModalState();
             }}
             onProjectAdded={handleProjectAdded}
             onProjectUpdated={handleProjectUpdated}
             editingProject={editingProject} // Pass project to be edited
             selectedColor={selectedColor}
-            setSelectedColor={setSelectedColor}
+            setSelectedColor={(color) =>
+              dispatch({ type: "SET_SELECTED_COLOR", payload: color })
+            }
           />
 
           {/* Favorites Section */}
@@ -87,7 +81,7 @@ const Favorites = () => {
                   key={project.id}
                   onMouseEnter={() => setHoveredProjectId(project.id)}
                   onMouseLeave={() => setHoveredProjectId(null)}
-                  onClick={() => setSelectedProjectId(project.id)}
+                  
                   className={`group p-2 rounded cursor-pointer flex items-center gap-2 ${
                     selectedProjectId === project.id
                       ? "bg-orange-200 text-orange-700"
@@ -96,7 +90,9 @@ const Favorites = () => {
                 >
                   <div
                     className="w-full"
-                    onClick={() => setSelectedProjectId(project.id)}
+                    onClick={() =>
+                      dispatch({ type: "SET_SELECTED_PROJECT_ID", payload: project.id })
+                    }
                   >
                     <Link to={`/my-projects/${project.name}`}>
                       <div className="flex items-center">

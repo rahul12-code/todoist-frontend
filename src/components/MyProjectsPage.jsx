@@ -10,18 +10,11 @@ import { Input } from "antd";
 import { useProjects } from "./ProjectContext";
 
 const MyProjectsPage = () => {
+
   const {
-    setSelectedProjectId,
     projects,
-    addProject,
-    updateProject,
-    deleteProject,
-    projectsmodalVisible,
-    setProjectsModalVisible,
-    selectedColor,
-    setSelectedColor,
-    editingProject,
-    setEditingProject,
+    dispatch,
+    state: { selectedProjectId, projectsModalVisible, selectedColor, editingProject},
   } = useProjects();
 
   // State to track the search query
@@ -30,8 +23,8 @@ const MyProjectsPage = () => {
 
   useEffect(() => {
     // Reset selectedProjectId when MyProjectsPage is loaded
-    setSelectedProjectId(null);
-  }, [setSelectedProjectId]);
+    dispatch({type:"SET_SELECTED_PROJECT_ID",payload:null})
+  }, [selectedProjectId]);
 
   const getHashtagColor = (project) => {
     const color = colorOptions.find((option) => option.value === project.color);
@@ -44,25 +37,25 @@ const MyProjectsPage = () => {
   );
 
   const resetModalState = () => {
-    setSelectedColor("charcoal");
-    setEditingProject(null);
+    dispatch({ type: "SET_SELECTED_COLOR", payload: "charcoal" });
+    dispatch({ type: "SET_EDITING_PROJECT", payload: null });
   };
 
   const handleEditProject = (project) => {
-    setEditingProject(project); // The project to be edited
-    setProjectsModalVisible(true); // Open the modal
-  };
-
-  const handleProjectUpdated = (updatedProject) => {
-    updateProject(updatedProject); // Use context to update the project
+    dispatch({ type: "SET_EDITING_PROJECT", payload: project });
+    dispatch({ type: "TOGGLE_PROJECTS_MODAL" });
   };
 
   const handleProjectAdded = (newProject) => {
-    addProject(newProject); // Use context to add the project
+    dispatch({ type: "ADD_PROJECT", payload: newProject });
+  };
+
+  const handleProjectUpdated = (updatedProject) => {
+    dispatch({ type: "UPDATE_PROJECT", payload: updatedProject });
   };
 
   const handleProjectDeleted = (projectId) => {
-    deleteProject(projectId); // Use context to delete the project
+    dispatch({ type: "DELETE_PROJECT", payload: projectId });
   };
 
   return (
@@ -85,7 +78,9 @@ const MyProjectsPage = () => {
           <div className="flex justify-end mb-2 ">
             <button
               className="text-[25px] font-normal px-2 rounded-[50%] hover:bg-gray-200"
-              onClick={() => setProjectsModalVisible(true)}
+              onClick={() => {
+                dispatch({ type: "TOGGLE_PROJECTS_MODAL" });
+              }}
             >
               +
             </button>
@@ -93,16 +88,18 @@ const MyProjectsPage = () => {
 
           {/* AddProjectModal Component */}
           <AddProjectModal
-            open={projectsmodalVisible}
+            open={projectsModalVisible}
             onClose={() => {
-              setProjectsModalVisible(false);
+              dispatch({ type: "TOGGLE_PROJECTS_MODAL" });
               resetModalState();
             }}
             onProjectAdded={handleProjectAdded}
             onProjectUpdated={handleProjectUpdated}
             editingProject={editingProject}
             selectedColor={selectedColor}
-            setSelectedColor={setSelectedColor}
+            setSelectedColor={(color) =>
+              dispatch({ type: "SET_SELECTED_COLOR", payload: color })
+            }
           />
 
           <p className="text-gray-700 font-medium mb-2 ">
@@ -123,7 +120,9 @@ const MyProjectsPage = () => {
               >
                 <div 
                   className="w-full"
-                  onClick={() => setSelectedProjectId(project.id)}>
+                  onClick={() =>
+                    dispatch({ type: "SET_SELECTED_PROJECT_ID", payload: project.id })
+                  }>
                   <Link to={`/my-projects/${project.name}`}>
                     <div className="flex items-center">
                       <span
