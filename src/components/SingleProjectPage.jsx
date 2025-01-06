@@ -60,6 +60,10 @@ const SingleProjectPage = () => {
     }
   }, [allProjects, projectName]);
 
+  if (!allProjects.some((project) => project.id === selectedProjectId)) {
+    return <div className=" flex justify-center items-center text-2xl relative top-52">No project found!</div>;
+  }
+
   const handleEditBlur = async () => {
     setIsEditing(false);
     if (editedProjectName !== projectName) {
