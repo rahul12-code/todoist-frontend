@@ -7,20 +7,18 @@ import { ProjectProvider } from "./components/ProjectContext";
 
 const App = () => {
   return (
-    <ProjectProvider>
-      <Router>
-        <div className="app-container">
-          <Sidebar />
-          <Routes>
-            <Route path="/" element={<MyProjectsPage />} />
-            <Route
-              path="/my-projects/:projectName"
-              element={<SingleProjectPage />}
-            />
-          </Routes>
-        </div>
-      </Router>
-    </ProjectProvider>
+    <Router>
+      <div className="app-container">
+        <Sidebar />
+        <Routes>
+          <Route path="/" element={<MyProjectsPage />} />
+          <Route
+            path="/my-projects/:projectName"
+            element={<SingleProjectPage />}
+          />
+        </Routes>
+      </div>
+    </Router>
   );
 };
 

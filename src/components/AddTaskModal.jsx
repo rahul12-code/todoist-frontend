@@ -1,27 +1,35 @@
 import React, { useState, useEffect } from "react";
 import { Button, Modal, Select } from "antd";
 
-import { useProjects } from "./ProjectContext";
+import { useDispatch, useSelector } from "react-redux";
+import { setTasks} from "../features/projects/projectSlice";
+import { TodoistApi } from "@doist/todoist-api-typescript";
+
+const api = new TodoistApi("7a41b607067ae6d30e04543770815e7f7aeee18e");
 
 const AddTaskModal = ({ open, onClose }) => {
+
+  const dispatch = useDispatch();
+
   const {
-    api,
-    projects,
-    inbox,
-    dispatch,
-    state: { tasks, allProjects, selectedProjectId },
-  } = useProjects();
+    allProjects,
+    selectedProjectId,
+    tasks,
+  } = useSelector((state) => state.projects);
 
   const [loading, setLoading] = useState(false);
   const [taskContent, setTaskContent] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
 
+  const projects=allProjects.filter(project=>project.name!=='Inbox')
+
   const [projectId, setProjectId] = useState(null);
+
   useEffect(() => {
     if (open) {
-      setProjectId(selectedProjectId || inbox?.id || (projects[0] && projects[0].id));
+      setProjectId(selectedProjectId || (projects[0] && projects[0].id));
     }
-  }, [open, selectedProjectId, inbox, projects]);
+  }, [open, selectedProjectId, projects]);
 
   const handleOk = () => {
     setLoading(true);
@@ -34,7 +42,7 @@ const AddTaskModal = ({ open, onClose }) => {
       .then((task) => {
         setLoading(false);
         if (selectedProjectId === task.projectId) {
-          dispatch({ type: "SET_TASKS", payload: [...tasks, task] });
+          dispatch(setTasks([...tasks, task]))
         }
         onClose();
         setTaskContent("");
@@ -69,12 +77,12 @@ const AddTaskModal = ({ open, onClose }) => {
       footer={[
         <Select
           key="project-select"
-          value={projectId || inbox?.id}
+          value={projectId}
           onChange={handleProjectChange}
           style={{ width: "20%", marginRight: "200px" }}
           placeholder="Select a project"
         >
-          {allProjects.map((project) => (
+          {projects.map((project) => (
             <Select.Option key={project.id} value={project.id}>
               {project.name}
             </Select.Option>

@@ -2,17 +2,25 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import AddTask from "./AddTask";
 import { EditOutlined } from "@ant-design/icons";
-import { useProjects } from "./ProjectContext";
 import TickMark from "../assets/tick-mark.svg";
-import "../App.css";
+import { TodoistApi } from "@doist/todoist-api-typescript";
+const api = new TodoistApi("7a41b607067ae6d30e04543770815e7f7aeee18e");
+
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setSelectedProjectId,
+  setTasks,
+} from "../features/projects/projectSlice";
 
 const SingleProjectPage = () => {
+
+  const dispatch = useDispatch();
+
   const {
-    api,
-    projects,
-    dispatch,
-    state: { selectedProjectId, tasks },
-  } = useProjects();
+    allProjects,
+    selectedProjectId,
+    tasks,
+  } = useSelector((state) => state.projects);
 
   const { projectName } = useParams();
 
@@ -22,13 +30,13 @@ const SingleProjectPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const matchedProject = projects.find(
+    const matchedProject = allProjects.find(
       (project) => project.name === projectName
     );
     if (matchedProject) {
-      dispatch({ type: "SET_SELECTED_PROJECT_ID", payload: matchedProject.id });
+      dispatch(setSelectedProjectId(matchedProject.id));
     }
-  }, [projectName,tasks]);
+  }, [projectName, tasks]);
 
   useEffect(() => {
     fetchTasks();
@@ -41,7 +49,7 @@ const SingleProjectPage = () => {
       const filteredTasks = allTasks.filter(
         (task) => task.projectId === selectedProjectId
       );
-      dispatch({ type: "SET_TASKS", payload: filteredTasks });
+      dispatch(setTasks(filteredTasks));
     } catch (error) {
       console.error("Error fetching tasks:", error);
     } finally {
@@ -49,15 +57,19 @@ const SingleProjectPage = () => {
     }
   };
 
-  if (!projects.some((project) => project.id === selectedProjectId)) {
-    return <div className=" flex justify-center items-center text-2xl relative top-52">No project found!</div>;
+  if (!allProjects.some((project) => project.id === selectedProjectId)) {
+    return (
+      <div className=" flex justify-center items-center text-2xl relative top-52">
+        No project found!
+      </div>
+    );
   }
 
   const handleAddTask = async (newTask) => {
     try {
       const addedTask = await api.addTask(newTask);
       if (selectedProjectId === newTask.projectId) {
-        dispatch({ type: "SET_TASKS", payload: [...tasks, addedTask] });
+        dispatch(setTasks([...tasks, addedTask]));
       }
       setIsAddTaskVisible(false); // Hide the AddTask component after adding the task
     } catch (error) {
@@ -68,10 +80,7 @@ const SingleProjectPage = () => {
   const handleDeleteTask = async (taskId) => {
     try {
       await api.deleteTask(taskId);
-      dispatch({
-        type: "SET_TASKS",
-        payload: tasks.filter((task) => task.id !== taskId),
-      });
+      dispatch(setTasks(tasks.filter((task) => task.id !== taskId)));
     } catch (error) {
       console.error("Error deleting task:", error);
     }
@@ -79,13 +88,15 @@ const SingleProjectPage = () => {
 
   const handleUpdateTask = async (updatedTask) => {
     try {
-      await api.updateTask(updatedTask.id, updatedTask); 
-      dispatch({
-        type: "SET_TASKS",
-        payload: tasks.map((task) =>
-          task.id === updatedTask.id ? { ...task, ...updatedTask } : task
-        ),
-      });
+      await api.updateTask(updatedTask.id, updatedTask);
+      dispatch(
+        setTasks(
+          tasks.map((task) =>
+            task.id === updatedTask.id ? { ...task, ...updatedTask } : task
+          )
+        )
+      );
+
       setTaskBeingEdited(null);
     } catch (error) {
       console.error("Error updating task:", error);

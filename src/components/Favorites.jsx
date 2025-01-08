@@ -3,16 +3,30 @@ import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import AddProjectModal from "./AddProjectModal";
 import { colorOptions } from "../ColorOptions";
 import MoreOptions from "./MoreOptions";
-import { useProjects } from "./ProjectContext";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchProjects,
+  setSelectedProjectId,
+  toggleProjectsModal,
+  setEditingProject,
+  addProject,
+  updateProject,
+  deleteProject,
+  setSelectedColor,
+} from "../features/projects/projectSlice";
 
 const Favorites = () => {
 
+  const dispatch = useDispatch();
+
   const {
-    favorites,
-    dispatch,
-    state: { selectedProjectId, projectsModalVisible, selectedColor, editingProject},
-  } = useProjects();
+    allProjects,
+    selectedProjectId,
+    projectsModalVisible,
+    selectedColor,
+    editingProject,
+  } = useSelector((state) => state.projects);
 
   const [favoritesVisible, setFavoritesVisible] = useState(true);
   const [hoveredProjectId, setHoveredProjectId] = useState(null);
@@ -23,30 +37,18 @@ const Favorites = () => {
   };
 
   const resetModalState = () => {
-    dispatch({ type: "SET_SELECTED_COLOR", payload: "charcoal" });
-    dispatch({ type: "SET_EDITING_PROJECT", payload: null });
+    dispatch(setSelectedColor("charcoal"));
+    dispatch(setEditingProject(null));
   };
 
   const handleEditProject = (project) => {
-    dispatch({ type: "SET_EDITING_PROJECT", payload: project });
-    dispatch({ type: "TOGGLE_PROJECTS_MODAL" });
-  };
-
-  const handleProjectAdded = (newProject) => {
-    dispatch({ type: "ADD_PROJECT", payload: newProject });
-  };
-
-  const handleProjectUpdated = (updatedProject) => {
-    dispatch({ type: "UPDATE_PROJECT", payload: updatedProject });
-  };
-
-  const handleProjectDeleted = (projectId) => {
-    dispatch({ type: "DELETE_PROJECT", payload: projectId });
+    dispatch(setEditingProject(project))
+    dispatch(toggleProjectsModal())
   };
 
   return (
     <div className="mb-4">
-      {favorites.length > 0 && (
+      {allProjects.filter((project) => project.isFavorite).length > 0 && (
         <>
           <div className="flex items-center justify-between cursor-pointer mb-2">
             <h2 className="text-gray-700 font-semibold">Favorites</h2>
@@ -61,67 +63,70 @@ const Favorites = () => {
           <AddProjectModal
             open={projectsModalVisible}
             onClose={() => {
-              dispatch({ type: "TOGGLE_PROJECTS_MODAL" });
+              dispatch(toggleProjectsModal());
               resetModalState();
             }}
-            onProjectAdded={handleProjectAdded}
-            onProjectUpdated={handleProjectUpdated}
-            editingProject={editingProject} // Pass project to be edited
-            selectedColor={selectedColor}
-            setSelectedColor={(color) =>
-              dispatch({ type: "SET_SELECTED_COLOR", payload: color })
+            onProjectAdded={(newProject) => dispatch(addProject(newProject))}
+            onProjectUpdated={(updatedProject) =>
+              dispatch(updateProject(updatedProject))
             }
+            editingProject={editingProject}
+            selectedColor={selectedColor}
+            setSelectedColor={(color) => dispatch(setSelectedColor(color))}
           />
 
           {/* Favorites Section */}
           {favoritesVisible && (
             <ul>
-              {favorites.map((project) => (
-                <li
-                  key={project.id}
-                  onMouseEnter={() => setHoveredProjectId(project.id)}
-                  onMouseLeave={() => setHoveredProjectId(null)}
-                  
-                  className={`group p-2 rounded cursor-pointer flex items-center gap-2 ${
-                    selectedProjectId === project.id
-                      ? "bg-orange-200 text-orange-700"
-                      : "hover:bg-gray-200"
-                  }`}
-                >
-                  <div
-                    className="w-full"
-                    onClick={() =>
-                      dispatch({ type: "SET_SELECTED_PROJECT_ID", payload: project.id })
-                    }
+              {allProjects
+                .filter((project) => project.isFavorite)
+                .map((project) => (
+                  <li
+                    key={project.id}
+                    onMouseEnter={() => setHoveredProjectId(project.id)}
+                    onMouseLeave={() => setHoveredProjectId(null)}
+                    className={`group p-2 rounded cursor-pointer flex items-center gap-2 ${
+                      selectedProjectId === project.id
+                        ? "bg-orange-200 text-orange-700"
+                        : "hover:bg-gray-200"
+                    }`}
                   >
-                    <Link to={`/my-projects/${project.name}`}>
-                      <div className="flex items-center">
-                        <span
-                          className="text-[18px] font-semibold mr-2"
-                          style={{ color: getHashtagColor(project) }}
-                        >
-                          #
-                        </span>
-                        <span>{project.name}</span>
-                      </div>
-                    </Link>
-                  </div>
+                    <div
+                      className="w-full"
+                      onClick={() => dispatch(setSelectedProjectId(project.id))}
+                    >
+                      <Link to={`/my-projects/${project.name}`}>
+                        <div className="flex items-center">
+                          <span
+                            className="text-[18px] font-semibold mr-2"
+                            style={{ color: getHashtagColor(project) }}
+                          >
+                            #
+                          </span>
+                          <span>{project.name}</span>
+                        </div>
+                      </Link>
+                    </div>
 
-                  <div>
-                    {/* To Display three dots */}
-                    {hoveredProjectId === project.id && (
-                      <div className="group-hover:opacity-100">
-                        <MoreOptions
-                          project={project}
-                          onEdit={handleEditProject} // Pass edit handler
-                          onDelete={handleProjectDeleted} // Pass delete handler
-                          updateProject={handleProjectUpdated}
-                        />
-                      </div>
-                    )}
-                  </div>
-                </li>
-              ))}
+                    <div>
+                      {/* To Display three dots */}
+                      {hoveredProjectId === project.id && (
+                        <div className="group-hover:opacity-100">
+                          <MoreOptions
+                            project={project}
+                            onEdit={handleEditProject} // pass edit handler
+                            onDelete={(projectId) =>
+                              dispatch(deleteProject(projectId))
+                            } // pass delete handler
+                            updateProject={(proj) =>
+                              dispatch(updateProject(proj))
+                            }
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </li>
+                ))}
             </ul>
           )}
         </>

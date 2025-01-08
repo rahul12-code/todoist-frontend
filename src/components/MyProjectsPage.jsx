@@ -7,15 +7,29 @@ import { Link } from "react-router-dom";
 import { SearchOutlined } from "@ant-design/icons";
 import { Input } from "antd";
 
-import { useProjects } from "./ProjectContext";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  fetchProjects,
+  setSelectedProjectId,
+  toggleProjectsModal,
+  setEditingProject,
+  addProject,
+  updateProject,
+  deleteProject,
+  setSelectedColor,
+} from "../features/projects/projectSlice";
 
 const MyProjectsPage = () => {
 
+  const dispatch = useDispatch();
+
   const {
-    projects,
-    dispatch,
-    state: { selectedProjectId, projectsModalVisible, selectedColor, editingProject},
-  } = useProjects();
+    allProjects,
+    selectedProjectId,
+    projectsModalVisible,
+    selectedColor,
+    editingProject,
+  } = useSelector((state) => state.projects);
 
   // State to track the search query
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,7 +37,7 @@ const MyProjectsPage = () => {
 
   useEffect(() => {
     // Reset selectedProjectId when MyProjectsPage is loaded
-    dispatch({type:"SET_SELECTED_PROJECT_ID",payload:null})
+    dispatch(setSelectedProjectId(null));
   }, [selectedProjectId]);
 
   const getHashtagColor = (project) => {
@@ -32,30 +46,20 @@ const MyProjectsPage = () => {
   };
 
   // Filter the projects based on the search query
-  const filteredProjects = projects.filter((project) =>
-    project.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredProjects = allProjects
+    .filter((project) => project.name.toLowerCase() !== "inbox")
+    .filter((project) =>
+      project.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
   const resetModalState = () => {
-    dispatch({ type: "SET_SELECTED_COLOR", payload: "charcoal" });
-    dispatch({ type: "SET_EDITING_PROJECT", payload: null });
+    dispatch(setSelectedColor("charcoal"));
+    dispatch(setEditingProject(null));
   };
 
   const handleEditProject = (project) => {
-    dispatch({ type: "SET_EDITING_PROJECT", payload: project });
-    dispatch({ type: "TOGGLE_PROJECTS_MODAL" });
-  };
-
-  const handleProjectAdded = (newProject) => {
-    dispatch({ type: "ADD_PROJECT", payload: newProject });
-  };
-
-  const handleProjectUpdated = (updatedProject) => {
-    dispatch({ type: "UPDATE_PROJECT", payload: updatedProject });
-  };
-
-  const handleProjectDeleted = (projectId) => {
-    dispatch({ type: "DELETE_PROJECT", payload: projectId });
+    dispatch(setEditingProject(project));
+    dispatch(toggleProjectsModal());
   };
 
   return (
@@ -79,7 +83,7 @@ const MyProjectsPage = () => {
             <button
               className="text-[25px] font-normal px-2 rounded-[50%] hover:bg-gray-200"
               onClick={() => {
-                dispatch({ type: "TOGGLE_PROJECTS_MODAL" });
+                dispatch(toggleProjectsModal());
               }}
             >
               +
@@ -90,16 +94,16 @@ const MyProjectsPage = () => {
           <AddProjectModal
             open={projectsModalVisible}
             onClose={() => {
-              dispatch({ type: "TOGGLE_PROJECTS_MODAL" });
+              dispatch(toggleProjectsModal());
               resetModalState();
             }}
-            onProjectAdded={handleProjectAdded}
-            onProjectUpdated={handleProjectUpdated}
+            onProjectAdded={(newProject) => dispatch(addProject(newProject))}
+            onProjectUpdated={(updatedProject) =>
+              dispatch(updateProject(updatedProject))
+            }
             editingProject={editingProject}
             selectedColor={selectedColor}
-            setSelectedColor={(color) =>
-              dispatch({ type: "SET_SELECTED_COLOR", payload: color })
-            }
+            setSelectedColor={(color) => dispatch(setSelectedColor(color))}
           />
 
           <p className="text-gray-700 font-medium mb-2 ">
@@ -113,16 +117,14 @@ const MyProjectsPage = () => {
                 onMouseEnter={() => setHoveredProjectId(project.id)}
                 onMouseLeave={() => setHoveredProjectId(null)}
                 onClick={(e) => {
-                  // setSelectedProjectId(project.id);
                   (e) => e.stopPropagation();
                 }}
                 className="group p-2 rounded cursor-pointer flex items-center justify-between gap-2 hover:bg-gray-200"
               >
-                <div 
+                <div
                   className="w-full"
-                  onClick={() =>
-                    dispatch({ type: "SET_SELECTED_PROJECT_ID", payload: project.id })
-                  }>
+                  onClick={() => dispatch(setSelectedProjectId(project.id))}
+                >
                   <Link to={`/my-projects/${project.name}`}>
                     <div className="flex items-center">
                       <span
@@ -140,9 +142,9 @@ const MyProjectsPage = () => {
                 {hoveredProjectId === project.id && (
                   <MoreOptions
                     project={project}
-                    onEdit={handleEditProject}
-                    onDelete={handleProjectDeleted} // Pass delete handler
-                    updateProject={handleProjectUpdated}
+                    onEdit={handleEditProject} // pass edit handler
+                    onDelete={(projectId) => dispatch(deleteProject(projectId))} // pass delete handler
+                    updateProject={(proj) => dispatch(updateProject(proj))}
                   />
                 )}
               </li>

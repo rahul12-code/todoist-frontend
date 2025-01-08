@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useProjects } from "./ProjectContext";
+// import { useProjects } from "./ProjectContext";
 import { Select } from "antd";
+import { useDispatch, useSelector } from "react-redux";
 
 const AddTask = ({
   onAddTask,
@@ -9,23 +10,24 @@ const AddTask = ({
   initialData,
   taskBeingEdited,
 }) => {
-  const {
-    projects,
-    inbox,
-    state: { allProjects,selectedProjectId },
-  } = useProjects();
+
+  const dispatch = useDispatch();
+
+  const { allProjects, selectedProjectId, tasks } = useSelector(
+    (state) => state.projects
+  );
 
   const [taskContent, setTaskContent] = useState(initialData?.content || "");
   const [taskDescription, setTaskDescription] = useState(
     initialData?.description || ""
   );
 
+  const projects = allProjects.filter((project) => project.name !== "Inbox");
   const [projectId, setProjectId] = useState(null);
+
   useEffect(() => {
-    setProjectId(
-      selectedProjectId || inbox?.id || (projects[0] && projects[0].id)
-    );
-  }, [selectedProjectId, inbox, projects]);
+    setProjectId(selectedProjectId || (projects[0] && projects[0].id));
+  }, [selectedProjectId, projects]);
 
   const handleAddorUpdateTask = () => {
     if (!taskContent) {
@@ -83,7 +85,7 @@ const AddTask = ({
           style={{ width: "20%" }}
           placeholder="Select a project"
         >
-          {allProjects.map((project) => (
+          {projects.map((project) => (
             <Select.Option key={project.id} value={project.id}>
               {project.name}
             </Select.Option>

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Input, Button, Switch, Select } from "antd";
 import ColorSelect from "./ColorSelect";
-import { useProjects } from "./ProjectContext";
+import { TodoistApi } from '@doist/todoist-api-typescript';
+const api = new TodoistApi("7a41b607067ae6d30e04543770815e7f7aeee18e");
 
 const AddProjectModal = ({
   open,
@@ -12,7 +13,6 @@ const AddProjectModal = ({
   selectedColor,
   setSelectedColor,
 }) => {
-  const { api } = useProjects();
   const [projectName, setProjectName] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
 

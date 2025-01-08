@@ -2,11 +2,9 @@ import React, { useState } from "react";
 import Favorites from "./Favorites";
 import Projects from "./Projects";
 import AddTaskModal from "./AddTaskModal";
-import { useProjects } from "./ProjectContext";
 
 const SidebarItems = () => {
   const [tasksmodalVisible, setTasksModalVisible] = useState(false);
-  const { inbox } = useProjects();
 
   return (
     <div className="text-[16px]">
@@ -27,17 +25,6 @@ const SidebarItems = () => {
           setTasksModalVisible(false);
         }}
       />
-
-      {/* Inbox */}
-      {inbox && (
-        <div className="mb-4">
-          <ul>
-            <li className="font-medium text-[17px] p-2 pl-0 rounded cursor-pointer">
-              {inbox.name}
-            </li>
-          </ul>
-        </div>
-      )}
 
       {/* Favorites Section */}
       <Favorites />

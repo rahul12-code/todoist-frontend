@@ -7,10 +7,10 @@ import {
   EllipsisOutlined,
 } from "@ant-design/icons";
 
-import { useProjects } from "./ProjectContext";
+import { TodoistApi } from '@doist/todoist-api-typescript';
+const api = new TodoistApi("7a41b607067ae6d30e04543770815e7f7aeee18e");
 
 const MoreOptions = ({ project, onEdit, onDelete, updateProject }) => {
-  const { api } = useProjects();
 
   // Delete Project
   const handleDeleteProject = async (projectId) => {
