@@ -38,7 +38,7 @@ const MyProjectsPage = () => {
   useEffect(() => {
     // Reset selectedProjectId when MyProjectsPage is loaded
     dispatch(setSelectedProjectId(null));
-  }, [selectedProjectId]);
+  }, []);
 
   const getHashtagColor = (project) => {
     const color = colorOptions.find((option) => option.value === project.color);

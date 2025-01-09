@@ -12,12 +12,6 @@ export const fetchProjects = createAsyncThunk(
   }
 );
 
-// Async thunk for fetching tasks
-// export const fetchTasks = createAsyncThunk('projects/fetchTasks', async () => {
-//     const response = await api.getTasks();
-//     return response;
-//   });
-
 const initialState = {
   allProjects: [],
   selectedProjectId: null,
@@ -65,11 +59,8 @@ const projectSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(fetchProjects.fulfilled, (state, action) => {
-      state.allProjects = action.payload;
+      state.allProjects = action.payload; // update the state when the action is fulfilled
     });
-    // builder.addCase(fetchTasks.fulfilled, (state, action) => {
-    //   state.tasks = action.payload;
-    // });
   },
 });
 

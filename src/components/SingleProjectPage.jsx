@@ -40,7 +40,7 @@ const SingleProjectPage = () => {
 
   useEffect(() => {
     fetchTasks();
-  }, [api, selectedProjectId]);
+  }, [selectedProjectId]);
 
   const fetchTasks = async () => {
     setLoading(true);
