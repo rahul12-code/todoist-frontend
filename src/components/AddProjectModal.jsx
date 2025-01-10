@@ -15,6 +15,7 @@ const AddProjectModal = ({
 }) => {
   const [projectName, setProjectName] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
+  // const [selectedColor, setSelectedColor] = useState("charcoal")
 
   // Reset the modal internal state when it becomes visible
   useEffect(() => {

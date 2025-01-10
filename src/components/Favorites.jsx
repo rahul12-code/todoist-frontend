@@ -6,10 +6,7 @@ import MoreOptions from "./MoreOptions";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
-  fetchProjects,
   setSelectedProjectId,
-  toggleProjectsModal,
-  setEditingProject,
   addProject,
   updateProject,
   deleteProject,
@@ -23,13 +20,13 @@ const Favorites = () => {
   const {
     allProjects,
     selectedProjectId,
-    projectsModalVisible,
     selectedColor,
-    editingProject,
   } = useSelector((state) => state.projects);
 
+  const [projectsModalVisible, setProjectsModalVisible] = useState(false);
   const [favoritesVisible, setFavoritesVisible] = useState(true);
   const [hoveredProjectId, setHoveredProjectId] = useState(null);
+  const [editingProject, setEditingProject] = useState(null);
 
   const getHashtagColor = (project) => {
     const color = colorOptions.find((option) => option.value === project.color);
@@ -38,12 +35,12 @@ const Favorites = () => {
 
   const resetModalState = () => {
     dispatch(setSelectedColor("charcoal"));
-    dispatch(setEditingProject(null));
+    setEditingProject(null);
   };
 
   const handleEditProject = (project) => {
-    dispatch(setEditingProject(project))
-    dispatch(toggleProjectsModal())
+    setEditingProject(project)
+    setProjectsModalVisible((prev)=>(!prev));
   };
 
   return (
@@ -63,7 +60,7 @@ const Favorites = () => {
           <AddProjectModal
             open={projectsModalVisible}
             onClose={() => {
-              dispatch(toggleProjectsModal());
+              setProjectsModalVisible((prev)=>(!prev))
               resetModalState();
             }}
             onProjectAdded={(newProject) => dispatch(addProject(newProject))}

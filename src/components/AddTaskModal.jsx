@@ -20,16 +20,16 @@ const AddTaskModal = ({ open, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [taskContent, setTaskContent] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
+  const [projectId, setProjectId] = useState(null);
 
   const projects=allProjects.filter(project=>project.name!=='Inbox')
 
-  const [projectId, setProjectId] = useState(null);
-
   useEffect(() => {
+    console.log(open)
     if (open) {
       setProjectId(selectedProjectId || (projects[0] && projects[0].id));
     }
-  }, [open, selectedProjectId, projects]);
+  }, [open]);
 
   const handleOk = () => {
     setLoading(true);
@@ -64,7 +64,9 @@ const AddTaskModal = ({ open, onClose }) => {
 
   const handleDescriptionChange = (e) => setTaskDescription(e.target.value);
 
-  const handleProjectChange = (value) => setProjectId(value);
+  const handleProjectChange = (value) => {
+    setProjectId(value);
+  };
 
   if (!open) return null;
 

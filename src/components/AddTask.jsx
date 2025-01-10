@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-// import { useProjects } from "./ProjectContext";
 import { Select } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -21,13 +20,13 @@ const AddTask = ({
   const [taskDescription, setTaskDescription] = useState(
     initialData?.description || ""
   );
+  const [projectId, setProjectId] = useState(null);
 
   const projects = allProjects.filter((project) => project.name !== "Inbox");
-  const [projectId, setProjectId] = useState(null);
 
   useEffect(() => {
     setProjectId(selectedProjectId || (projects[0] && projects[0].id));
-  }, [selectedProjectId, projects]);
+  }, []);
 
   const handleAddorUpdateTask = () => {
     if (!taskContent) {

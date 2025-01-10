@@ -6,11 +6,10 @@ import { colorOptions } from "../ColorOptions";
 import MoreOptions from "./MoreOptions";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+
 import {
   fetchProjects,
   setSelectedProjectId,
-  toggleProjectsModal,
-  setEditingProject,
   addProject,
   updateProject,
   deleteProject,
@@ -24,13 +23,13 @@ const Projects = () => {
   const {
     allProjects,
     selectedProjectId,
-    projectsModalVisible,
     selectedColor,
-    editingProject,
   } = useSelector((state) => state.projects);
 
+  const [projectsModalVisible, setProjectsModalVisible] = useState(false);
   const [projectsVisible, setProjectsVisible] = useState(true);
   const [hoveredProjectId, setHoveredProjectId] = useState(null);
+  const [editingProject, setEditingProject] = useState(null);
 
   useEffect(() => {
     if (allProjects.length === 0) {
@@ -45,12 +44,12 @@ const Projects = () => {
 
   const resetModalState = () => {
     dispatch(setSelectedColor("charcoal"));
-    dispatch(setEditingProject(null));
+    setEditingProject(null)
   };
 
   const handleEditProject = (project) => {
-    dispatch(setEditingProject(project))
-    dispatch(toggleProjectsModal())
+    setEditingProject(project)
+    setProjectsModalVisible((prev)=>(!prev))
   };
 
   return (
@@ -67,7 +66,7 @@ const Projects = () => {
         <div className="flex gap-2 text-gray-600 items-center">
           <span
             className="text-gray-500 text-[22px] px-2 hover:text-gray-600"
-            onClick={() => dispatch(toggleProjectsModal())}
+            onClick={() => setProjectsModalVisible((prev)=>(!prev))}
           >
             +
           </span>
@@ -83,7 +82,7 @@ const Projects = () => {
       <AddProjectModal
         open={projectsModalVisible}
         onClose={() => {
-          dispatch(toggleProjectsModal());
+          setProjectsModalVisible((prev)=>(!prev))
           resetModalState();
         }}
         onProjectAdded={(newProject) => dispatch(addProject(newProject))}

@@ -15,10 +15,8 @@ export const fetchProjects = createAsyncThunk(
 const initialState = {
   allProjects: [],
   selectedProjectId: null,
-  projectsModalVisible: false,
   selectedColor: "charcoal",
-  editingProject: null,
-  tasks: [],
+  tasks:[],
 };
 
 const projectSlice = createSlice({
@@ -28,16 +26,10 @@ const projectSlice = createSlice({
     setSelectedProjectId(state, action) {
       state.selectedProjectId = action.payload;
     },
-    toggleProjectsModal(state) {
-      state.projectsModalVisible = !state.projectsModalVisible;
-    },
     setSelectedColor(state, action) {
       state.selectedColor = action.payload;
     },
-    setEditingProject(state, action) {
-      state.editingProject = action.payload;
-    },
-    setTasks(state, action) {
+    setTasks(state,action){
       state.tasks = action.payload;
     },
     addProject(state, action) {
@@ -66,9 +58,7 @@ const projectSlice = createSlice({
 
 export const {
   setSelectedProjectId,
-  toggleProjectsModal,
   setSelectedColor,
-  setEditingProject,
   setTasks,
   addProject,
   deleteProject,

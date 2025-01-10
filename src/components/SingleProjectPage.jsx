@@ -13,7 +13,6 @@ import {
 } from "../features/projects/projectSlice";
 
 const SingleProjectPage = () => {
-
   const dispatch = useDispatch();
 
   const {
@@ -89,13 +88,11 @@ const SingleProjectPage = () => {
   const handleUpdateTask = async (updatedTask) => {
     try {
       await api.updateTask(updatedTask.id, updatedTask);
-      dispatch(
-        setTasks(
-          tasks.map((task) =>
-            task.id === updatedTask.id ? { ...task, ...updatedTask } : task
-          )
+      dispatch(setTasks(
+        tasks.map((task) =>
+          task.id === updatedTask.id ? { ...task, ...updatedTask } : task
         )
-      );
+      ));
 
       setTaskBeingEdited(null);
     } catch (error) {

@@ -9,10 +9,7 @@ import { Input } from "antd";
 
 import { useDispatch, useSelector } from "react-redux";
 import {
-  fetchProjects,
   setSelectedProjectId,
-  toggleProjectsModal,
-  setEditingProject,
   addProject,
   updateProject,
   deleteProject,
@@ -26,14 +23,15 @@ const MyProjectsPage = () => {
   const {
     allProjects,
     selectedProjectId,
-    projectsModalVisible,
     selectedColor,
-    editingProject,
   } = useSelector((state) => state.projects);
 
   // State to track the search query
   const [searchQuery, setSearchQuery] = useState("");
   const [hoveredProjectId, setHoveredProjectId] = useState(null); // State to track the hovered project
+  const [projectsModalVisible, setProjectsModalVisible] = useState(false);
+  const [editingProject, setEditingProject] = useState(null);
+
 
   useEffect(() => {
     // Reset selectedProjectId when MyProjectsPage is loaded
@@ -54,12 +52,12 @@ const MyProjectsPage = () => {
 
   const resetModalState = () => {
     dispatch(setSelectedColor("charcoal"));
-    dispatch(setEditingProject(null));
+    setEditingProject(null)
   };
 
   const handleEditProject = (project) => {
-    dispatch(setEditingProject(project));
-    dispatch(toggleProjectsModal());
+    setEditingProject(project)
+    setProjectsModalVisible((prev)=>(!prev))
   };
 
   return (
@@ -82,9 +80,7 @@ const MyProjectsPage = () => {
           <div className="flex justify-end mb-2 ">
             <button
               className="text-[25px] font-normal px-2 rounded-[50%] hover:bg-gray-200"
-              onClick={() => {
-                dispatch(toggleProjectsModal());
-              }}
+              onClick={() => setProjectsModalVisible((prev)=>(!prev))}
             >
               +
             </button>
@@ -94,7 +90,7 @@ const MyProjectsPage = () => {
           <AddProjectModal
             open={projectsModalVisible}
             onClose={() => {
-              dispatch(toggleProjectsModal());
+              setProjectsModalVisible((prev)=>(!prev))
               resetModalState();
             }}
             onProjectAdded={(newProject) => dispatch(addProject(newProject))}
