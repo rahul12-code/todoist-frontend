@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Sidebar from "../src/components/Sidebar";
 import MyProjectsPage from "./components/MyProjectsPage";
 import SingleProjectPage from "./components/SingleProjectPage";
-import { ProjectProvider } from "./components/ProjectContext";
 
 const App = () => {
   return (
