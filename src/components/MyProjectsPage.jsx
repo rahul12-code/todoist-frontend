@@ -13,7 +13,6 @@ import {
   addProject,
   updateProject,
   deleteProject,
-  setSelectedColor,
 } from "../features/projects/projectSlice";
 
 const MyProjectsPage = () => {
@@ -22,8 +21,6 @@ const MyProjectsPage = () => {
 
   const {
     allProjects,
-    selectedProjectId,
-    selectedColor,
   } = useSelector((state) => state.projects);
 
   // State to track the search query
@@ -51,7 +48,6 @@ const MyProjectsPage = () => {
     );
 
   const resetModalState = () => {
-    dispatch(setSelectedColor("charcoal"));
     setEditingProject(null)
   };
 
@@ -98,8 +94,6 @@ const MyProjectsPage = () => {
               dispatch(updateProject(updatedProject))
             }
             editingProject={editingProject}
-            selectedColor={selectedColor}
-            setSelectedColor={(color) => dispatch(setSelectedColor(color))}
           />
 
           <p className="text-gray-700 font-medium mb-2 ">

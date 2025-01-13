@@ -15,7 +15,6 @@ export const fetchProjects = createAsyncThunk(
 const initialState = {
   allProjects: [],
   selectedProjectId: null,
-  selectedColor: "charcoal",
   tasks:[],
 };
 
@@ -25,9 +24,6 @@ const projectSlice = createSlice({
   reducers: {
     setSelectedProjectId(state, action) {
       state.selectedProjectId = action.payload;
-    },
-    setSelectedColor(state, action) {
-      state.selectedColor = action.payload;
     },
     setTasks(state,action){
       state.tasks = action.payload;
@@ -58,7 +54,6 @@ const projectSlice = createSlice({
 
 export const {
   setSelectedProjectId,
-  setSelectedColor,
   setTasks,
   addProject,
   deleteProject,

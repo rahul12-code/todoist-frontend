@@ -13,7 +13,6 @@ import {
   addProject,
   updateProject,
   deleteProject,
-  setSelectedColor,
 } from "../features/projects/projectSlice";
 
 const Projects = () => {
@@ -23,7 +22,6 @@ const Projects = () => {
   const {
     allProjects,
     selectedProjectId,
-    selectedColor,
   } = useSelector((state) => state.projects);
 
   const [projectsModalVisible, setProjectsModalVisible] = useState(false);
@@ -43,7 +41,6 @@ const Projects = () => {
   };
 
   const resetModalState = () => {
-    dispatch(setSelectedColor("charcoal"));
     setEditingProject(null)
   };
 
@@ -90,8 +87,6 @@ const Projects = () => {
           dispatch(updateProject(updatedProject))
         }
         editingProject={editingProject}
-        selectedColor={selectedColor}
-        setSelectedColor={(color) => dispatch(setSelectedColor(color))}
       />
 
       {/* Projects Section */}

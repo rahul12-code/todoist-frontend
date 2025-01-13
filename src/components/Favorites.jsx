@@ -10,7 +10,6 @@ import {
   addProject,
   updateProject,
   deleteProject,
-  setSelectedColor,
 } from "../features/projects/projectSlice";
 
 const Favorites = () => {
@@ -20,7 +19,6 @@ const Favorites = () => {
   const {
     allProjects,
     selectedProjectId,
-    selectedColor,
   } = useSelector((state) => state.projects);
 
   const [projectsModalVisible, setProjectsModalVisible] = useState(false);
@@ -34,7 +32,6 @@ const Favorites = () => {
   };
 
   const resetModalState = () => {
-    dispatch(setSelectedColor("charcoal"));
     setEditingProject(null);
   };
 
@@ -68,8 +65,6 @@ const Favorites = () => {
               dispatch(updateProject(updatedProject))
             }
             editingProject={editingProject}
-            selectedColor={selectedColor}
-            setSelectedColor={(color) => dispatch(setSelectedColor(color))}
           />
 
           {/* Favorites Section */}

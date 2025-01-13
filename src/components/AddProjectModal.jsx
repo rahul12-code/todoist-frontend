@@ -10,12 +10,10 @@ const AddProjectModal = ({
   onProjectAdded,
   onProjectUpdated,
   editingProject,
-  selectedColor,
-  setSelectedColor,
 }) => {
   const [projectName, setProjectName] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
-  // const [selectedColor, setSelectedColor] = useState("charcoal")
+  const [selectedColor, setSelectedColor] = useState("charcoal")
 
   // Reset the modal internal state when it becomes visible
   useEffect(() => {
@@ -61,12 +59,17 @@ const AddProjectModal = ({
     }
   };
 
+  const handleCancel=()=>{
+    onClose();
+    setSelectedColor("charcoal")
+  }
+
   return (
     <Modal
       title={editingProject ? "Edit Project" : "Add Project"}
       mask={false}
       open={open}
-      onCancel={onClose}
+      onCancel={handleCancel}
       footer={[
         <Button className="font-semibold" key="back" onClick={onClose}>
           Cancel
