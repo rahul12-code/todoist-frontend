@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Menu, Dropdown } from "antd";
 import {
   EditOutlined,
@@ -7,15 +7,18 @@ import {
   EllipsisOutlined,
 } from "@ant-design/icons";
 
-import { TodoistApi } from '@doist/todoist-api-typescript';
-const api = new TodoistApi("7a41b607067ae6d30e04543770815e7f7aeee18e");
-
 const MoreOptions = ({ project, onEdit, onDelete, updateProject }) => {
 
   // Delete Project
   const handleDeleteProject = async (projectId) => {
     try {
-      await api.deleteProject(projectId);
+      const response = await fetch(`http://localhost:8081/api/projects/${projectId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete project");
+      }
       console.log(`Project with ID ${projectId} deleted successfully.`);
       onDelete(projectId);
     } catch (error) {
@@ -28,11 +31,24 @@ const MoreOptions = ({ project, onEdit, onDelete, updateProject }) => {
     try {
       const updatedProject = {
         ...project,
-        isFavorite: !project.isFavorite, // Toggle the favorite status
+        is_favorite: project.is_favorite === 1 ? 0 : 1, // Toggle the favorite status
       };
-      await api.updateProject(project.id,updatedProject)
+      
+      const response = await fetch(`http://localhost:8081/api/projects/${project.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedProject),
+      });
 
-      // Use the updateProject function passed from Projects component
+      if (!response.ok) {
+        throw new Error("Failed to update project");
+      }
+
+      const message = await response.json();
+      console.log('message:', message )
+
       updateProject(updatedProject);
     } catch (error) {
       console.error("Error Updating project:", error);
@@ -51,7 +67,7 @@ const MoreOptions = ({ project, onEdit, onDelete, updateProject }) => {
         <div className="flex gap-3 items-center">
           <HeartOutlined style={{ fill: "black" }} />
           <span>
-            {project.isFavorite ? "Remove from Favourites" : "Add to Favourite"}
+            {project.is_favorite === 1 ? "Remove from Favourites" : "Add to Favourite"}
           </span>
         </div>
       </Menu.Item>

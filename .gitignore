@@ -23,5 +23,3 @@ dist-ssr
 *.sln
 *.sw?
 
-Trail.js 
-./src/components/EmptyComponent.jsx

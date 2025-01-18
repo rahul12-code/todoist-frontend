@@ -54,7 +54,7 @@ const Projects = () => {
       <div className="flex items-center justify-between cursor-pointer hover:bg-gray-200 rounded-sm mb-2">
         {/* Use Link for navigation */}
         <Link
-          to="/"
+          to="/my-projects"
           className="text-gray-700 font-semibold hover:text-gray-700"
         >
           My Projects
@@ -93,7 +93,6 @@ const Projects = () => {
       {projectsVisible && (
         <ul>
           {allProjects
-            .filter((project) => project.name.toLowerCase() !== "inbox") // Exclude project with name 'inbox'
             .map((project) => (
               <li
                 key={project.id}

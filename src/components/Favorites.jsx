@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 import AddProjectModal from "./AddProjectModal";
 import { colorOptions } from "../ColorOptions";
@@ -6,6 +6,7 @@ import MoreOptions from "./MoreOptions";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  fetchProjects,
   setSelectedProjectId,
   addProject,
   updateProject,
@@ -26,6 +27,12 @@ const Favorites = () => {
   const [hoveredProjectId, setHoveredProjectId] = useState(null);
   const [editingProject, setEditingProject] = useState(null);
 
+  // useEffect(() => {
+  //   if (allProjects.length === 0) {
+  //     dispatch(fetchProjects());
+  //   }
+  // }, [dispatch, allProjects]);
+
   const getHashtagColor = (project) => {
     const color = colorOptions.find((option) => option.value === project.color);
     return color ? color.color : "#36454F";
@@ -42,7 +49,7 @@ const Favorites = () => {
 
   return (
     <div className="mb-4">
-      {allProjects.filter((project) => project.isFavorite).length > 0 && (
+      {allProjects.filter((project) => project.is_favorite).length > 0 && (
         <>
           <div className="flex items-center justify-between cursor-pointer mb-2">
             <h2 className="text-gray-700 font-semibold">Favorites</h2>
@@ -71,7 +78,7 @@ const Favorites = () => {
           {favoritesVisible && (
             <ul>
               {allProjects
-                .filter((project) => project.isFavorite)
+                .filter((project) => project.is_favorite)
                 .map((project) => (
                   <li
                     key={project.id}

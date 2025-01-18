@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Input, Button, Switch, Select } from "antd";
+import { Modal, Input, Button, Switch, Select, message } from "antd";
 import ColorSelect from "./ColorSelect";
-import { TodoistApi } from '@doist/todoist-api-typescript';
-const api = new TodoistApi("7a41b607067ae6d30e04543770815e7f7aeee18e");
 
 const AddProjectModal = ({
   open,
@@ -13,14 +11,14 @@ const AddProjectModal = ({
 }) => {
   const [projectName, setProjectName] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
-  const [selectedColor, setSelectedColor] = useState("charcoal")
+  const [selectedColor, setSelectedColor] = useState("charcoal");
 
   // Reset the modal internal state when it becomes visible
   useEffect(() => {
     if (open) {
       if (editingProject) {
         setProjectName(editingProject.name);
-        setIsFavorite(editingProject.isFavorite);
+        setIsFavorite(editingProject.is_favorite === 1);
         setSelectedColor(editingProject.color);
       } else {
         setProjectName("");
@@ -30,32 +28,56 @@ const AddProjectModal = ({
     }
   }, [open, editingProject]);
 
-  const handleAddOrUpdateProject = () => {
+  // Async function to handle add or update project
+  const handleAddOrUpdateProject = async () => {
     const projectData = {
+      id: editingProject?.id,
       name: projectName.trim(),
-      isFavorite: isFavorite,
+      is_favorite: isFavorite ? 1 : 0,
       color: selectedColor,
     };
 
-    if (editingProject) {
-      // Update project
-      api
-        .updateProject(editingProject.id, projectData)
-        .then((updatedProject) => {
-          onProjectUpdated(updatedProject);
-          onClose();
-        })
-        .catch((error) => console.error("Error updating project:", error));
-    } else {
-      // Add project
-      api
-        .addProject(projectData)
-        .then((newProject) => {
-          console.log("Project added:", newProject);
-          onProjectAdded(newProject);
-          onClose();
-        })
-        .catch((error) => console.error("Error adding project:", error));
+    try {
+      let response;
+      if (editingProject) {
+        // Update project using PUT
+        response = await fetch(`http://localhost:8081/api/projects/${editingProject.id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(projectData),
+        });
+      } else {
+        // Add new project using POST
+        const token = localStorage.getItem("token");
+        response = await fetch("http://localhost:8081/api/projects", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(projectData),
+        });
+      }
+
+      if (!response.ok) {
+        throw new Error("Failed to save project");
+      }
+      
+      if (editingProject) {
+        console.log(projectData);
+        onProjectUpdated(projectData); 
+      } else {
+        const message = await response.json(); // for retrieving ID
+        message.is_favorite = message.is_favorite ? 1 : 0;
+        console.log(message);
+        onProjectAdded(message); 
+      }
+
+      onClose(); // Close the modal after success
+    } catch (error) {
+      console.error("Error handling project:", error);
     }
   };
 

@@ -1,14 +1,25 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { TodoistApi } from "@doist/todoist-api-typescript";
 
-const api = new TodoistApi("7a41b607067ae6d30e04543770815e7f7aeee18e");
-
-// Async thunk for fetching projects
 export const fetchProjects = createAsyncThunk(
   "projects/fetchProjects",
-  async () => {
-    const response = await api.getProjects();
-    return response;
+  async (_, { rejectWithValue }) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch("http://localhost:8081/api/projects/user-projects", {
+        method: "GET",
+        headers: {
+          authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch user-specific projects");
+      }
+      const data = await response.json();
+      return data; // retrieves the projects
+      
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
   }
 );
 

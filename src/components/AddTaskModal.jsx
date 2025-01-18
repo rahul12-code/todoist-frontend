@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Modal, Select } from "antd";
-
 import { useDispatch, useSelector } from "react-redux";
 import { setTasks} from "../features/projects/projectSlice";
-import { TodoistApi } from "@doist/todoist-api-typescript";
-
-const api = new TodoistApi("7a41b607067ae6d30e04543770815e7f7aeee18e");
 
 const AddTaskModal = ({ open, onClose }) => {
 
@@ -17,41 +13,52 @@ const AddTaskModal = ({ open, onClose }) => {
     tasks,
   } = useSelector((state) => state.projects);
 
-  const [loading, setLoading] = useState(false);
   const [taskContent, setTaskContent] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
   const [projectId, setProjectId] = useState(null);
 
-  const projects=allProjects.filter(project=>project.name!=='Inbox')
-
   useEffect(() => {
-    console.log(open)
     if (open) {
-      setProjectId(selectedProjectId || (projects[0] && projects[0].id));
+      setProjectId(selectedProjectId || (allProjects[0] && allProjects[0].id));
     }
   }, [open]);
 
-  const handleOk = () => {
-    setLoading(true);
-    api
-      .addTask({
-        content: taskContent.trim(),
-        description: taskDescription.trim(),
-        projectId: projectId,
-      })
-      .then((task) => {
-        setLoading(false);
-        if (selectedProjectId === task.projectId) {
-          dispatch(setTasks([...tasks, task]))
-        }
-        onClose();
-        setTaskContent("");
-        setTaskDescription("");
-      })
-      .catch((error) => {
-        console.error("Error adding task:", error);
-        setLoading(false);
+  const handleAddTask = async () => {
+
+    const taskData = {
+      content: taskContent.trim(),
+      description: taskDescription.trim(),
+      project_id: projectId,
+    };
+    console.log(taskData);
+
+    try {
+      const response = await fetch(`http://localhost:8081/api/tasks/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(taskData),
       });
+      console.log(response);
+
+      if (!response.ok) {
+        throw new Error("Failed to add task");
+      }
+
+      const newTask = await response.json();
+      console.log(newTask)
+
+      if (selectedProjectId === newTask.project_id) {
+        dispatch(setTasks([...tasks, newTask]));
+      }
+
+      onClose();
+      setTaskContent("");
+      setTaskDescription("");
+    } catch (error) {
+      console.error("Error adding task:", error);
+    }
   };
 
   const handleCancel = () => {
@@ -64,9 +71,7 @@ const AddTaskModal = ({ open, onClose }) => {
 
   const handleDescriptionChange = (e) => setTaskDescription(e.target.value);
 
-  const handleProjectChange = (value) => {
-    setProjectId(value);
-  };
+  const handleProjectChange = (value) => setProjectId(value);
 
   if (!open) return null;
 
@@ -84,7 +89,7 @@ const AddTaskModal = ({ open, onClose }) => {
           style={{ width: "20%", marginRight: "200px" }}
           placeholder="Select a project"
         >
-          {projects.map((project) => (
+          {allProjects.map((project) => (
             <Select.Option key={project.id} value={project.id}>
               {project.name}
             </Select.Option>
@@ -96,8 +101,7 @@ const AddTaskModal = ({ open, onClose }) => {
         <Button
           key="submit"
           type="primary"
-          loading={loading}
-          onClick={handleOk}
+          onClick={handleAddTask}
           className="bg-orange-500"
         >
           Add Task

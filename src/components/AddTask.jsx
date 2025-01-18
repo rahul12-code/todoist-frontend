@@ -22,10 +22,9 @@ const AddTask = ({
   );
   const [projectId, setProjectId] = useState(null);
 
-  const projects = allProjects.filter((project) => project.name !== "Inbox");
 
   useEffect(() => {
-    setProjectId(selectedProjectId || (projects[0] && projects[0].id));
+    setProjectId(selectedProjectId || (allProjects[0] && allProjects[0].id));
   }, []);
 
   const handleAddorUpdateTask = () => {
@@ -39,12 +38,12 @@ const AddTask = ({
           ...initialData,
           content: taskContent,
           description: taskDescription,
-          projectId,
+          project_id:projectId,
         }
       : {
           content: taskContent,
           description: taskDescription,
-          projectId,
+          project_id:projectId,
         };
 
     taskBeingEdited ? onUpdateTask(taskData) : onAddTask(taskData);
@@ -55,7 +54,6 @@ const AddTask = ({
 
   const handleProjectChange = (value) => {
     setProjectId(value);
-    console.log(value, "Project ID changed");
   };
 
   return (
@@ -84,7 +82,7 @@ const AddTask = ({
           style={{ width: "20%" }}
           placeholder="Select a project"
         >
-          {projects.map((project) => (
+          {allProjects.map((project) => (
             <Select.Option key={project.id} value={project.id}>
               {project.name}
             </Select.Option>

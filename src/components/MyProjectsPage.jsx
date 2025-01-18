@@ -6,6 +6,7 @@ import MoreOptions from "./MoreOptions";
 import { Link } from "react-router-dom";
 import { SearchOutlined } from "@ant-design/icons";
 import { Input } from "antd";
+import Sidebar from "./Sidebar";
 
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -29,7 +30,6 @@ const MyProjectsPage = () => {
   const [projectsModalVisible, setProjectsModalVisible] = useState(false);
   const [editingProject, setEditingProject] = useState(null);
 
-
   useEffect(() => {
     // Reset selectedProjectId when MyProjectsPage is loaded
     dispatch(setSelectedProjectId(null));
@@ -42,9 +42,8 @@ const MyProjectsPage = () => {
 
   // Filter the projects based on the search query
   const filteredProjects = allProjects
-    .filter((project) => project.name.toLowerCase() !== "inbox")
     .filter((project) =>
-      project.name.toLowerCase().includes(searchQuery.toLowerCase())
+      project.name.includes(searchQuery)
     );
 
   const resetModalState = () => {
@@ -58,6 +57,7 @@ const MyProjectsPage = () => {
 
   return (
     <>
+      <Sidebar />
       <div className="flex items-center justify-center h-screen">
         <div className="p-6 rounded-lg w-[50%] absolute top-20">
           <h1 className="text-2xl font-bold mb-4">My Projects</h1>
@@ -91,6 +91,7 @@ const MyProjectsPage = () => {
             }}
             onProjectAdded={(newProject) => dispatch(addProject(newProject))}
             onProjectUpdated={(updatedProject) =>
+
               dispatch(updateProject(updatedProject))
             }
             editingProject={editingProject}
