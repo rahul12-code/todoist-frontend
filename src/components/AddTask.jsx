@@ -57,7 +57,7 @@ const AddTask = ({
   };
 
   return (
-    <div className="add-task-container w-full p-2 mt-4 border-2 border-gray-300 rounded-md shadow-sm">
+    <div className="add-task-container w-full p-2 my-5 border-2 border-gray-300 rounded-md shadow-sm">
       <input
         type="text"
         placeholder="Task Content"

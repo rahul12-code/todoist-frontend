@@ -4,6 +4,7 @@ import AddTask from "./AddTask";
 import { EditOutlined } from "@ant-design/icons";
 import TickMark from "../assets/tick-mark.svg";
 import Sidebar from "./Sidebar";
+import { fetchProjects } from "../features/projects/projectSlice";
 
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -25,6 +26,12 @@ const SingleProjectPage = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (allProjects.length === 0) {
+      dispatch(fetchProjects());  // Dispatch action to fetch all projects
+    }
+  }, []);
+
+  useEffect(() => {
     const matchedProject = allProjects.find(
       (project) => project.name === projectName
     );
@@ -33,6 +40,8 @@ const SingleProjectPage = () => {
     }
   }, [projectName, tasks, allProjects]);
 
+  console.log(selectedProjectId);
+
   useEffect(() => {
     fetchTasks();
   }, [selectedProjectId]);
@@ -40,14 +49,9 @@ const SingleProjectPage = () => {
   const fetchTasks = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:8081/api/tasks`);
+      const response = await fetch(`http://localhost:8081/api/tasks?project_id=${selectedProjectId}`);
       const allTasks = await response.json();
-
-      const filteredTasks = allTasks.filter(
-        (task) => task.project_id === selectedProjectId
-      );
-      // console.log(filteredTasks);
-      dispatch(setTasks(filteredTasks));
+      dispatch(setTasks(allTasks))
     } catch (error) {
       console.error("Error fetching tasks:", error);
     } finally {
