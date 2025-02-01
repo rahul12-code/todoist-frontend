@@ -1,8 +1,10 @@
-# React + Vite
+# 🚀 Project Task Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A task management application built with **React.js**, **Express.js**, and **SQLite**. This system allows users to register, log in, and manage tasks within projects. It includes full CRUD functionality for managing projects and tasks, with a focus on security, scalability, and a seamless user experience.
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠 Features
+- **User Authentication**: Allows users to register and log in securely.
+- **Task Management**: Users can create, read, update, and delete tasks within specific projects.
+- **Project Management**: Create, update, and delete projects to organize tasks.
+- **MongoDB Integration**: Used for storing project and task data.
+- **Frontend & Backend Integration**: Frontend is connected to the backend API to handle CRUD operations.
